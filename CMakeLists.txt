@@ -12,7 +12,7 @@ find_package(Lua REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 
 # Add executable
-add_executable(StrategyGame src/main.cpp src/game.cpp src/map.cpp src/unit.cpp src/resources.cpp)
+add_executable(StrategyGame src/main.cpp src/game.cpp src/map.cpp src/unit.cpp)
 
 # Link SDL2 and Lua libraries
 target_link_libraries(StrategyGame ${SDL2_LIBRARIES} ${LUA_LIBRARIES})

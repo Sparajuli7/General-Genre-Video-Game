@@ -10,6 +10,7 @@ void Unit::render(SDL_Renderer* renderer) {
     }
 }
 
+// change to accomodate graph instead of grid
 void Unit::move(const std::string& direction, int mapWidth, int mapHeight) {
     if (direction == "up" && y > 0) y--;
     if (direction == "down" && y < mapHeight - 1) y++;

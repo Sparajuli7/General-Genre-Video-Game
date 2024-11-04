@@ -3,7 +3,6 @@
 
 #include "map.h"
 #include "unit.h"
-#include "resources.h"
 #include <SDL2/SDL.h>
 #include <lua.hpp>
 #include <string>
@@ -28,7 +27,6 @@ private:
     Map* map;
     Unit* playerUnit;
     Unit* enemyUnit;
-    Resources* resources;
     lua_State* L;
 
     std::string getAIAction(Unit* unit);
