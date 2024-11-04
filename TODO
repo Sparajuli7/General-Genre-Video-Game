@@ -1,0 +1,4 @@
+Remake map.cpp and map.h into a graph
+Clean up game.cpp 
+Edit units to traverse a graph
+Implement json reader for configuration

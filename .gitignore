@@ -1,2 +1,6 @@
 .vscode/*
-!.CMakeFiles/*
+CMakeFiles/*
+StrategyGame
+cmake_install.cmake
+CMakeCache.txt
+Makefile

@@ -1,5 +1,7 @@
 #include "map.h"
 
+// Map will need to be fully remade to be a graph
+
 Map::Map(int width, int height) : width(width), height(height) {
     // Create a simple grid with all tiles passable
     grid.resize(height, std::vector<int>(width, 0));

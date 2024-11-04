@@ -1,3 +1,5 @@
+// Units have been removed from game.cpp until graph map is implemented
+
 #include "unit.h"
 
 Unit::Unit(int x, int y, int health, int attack) : x(x), y(y), health(health), attackPower(attack) {}
