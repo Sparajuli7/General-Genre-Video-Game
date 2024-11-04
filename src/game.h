@@ -6,6 +6,7 @@
 #include "resources.h"
 #include <SDL2/SDL.h>
 #include <lua.hpp>
+#include <string>
 
 class Game {
 public:
