@@ -1,4 +1,23 @@
-Remake map.cpp and map.h into a graph
+Remake map.cpp and map.h into a hex grid
+- Map should be hexes, likely a 3d array
+- Each hex should contain information such as amount of units, if theres a city, or resources
+- Create rendering method for the hex grid
+- https://catlikecoding.com/unity/tutorials/hex-map/ 
 Clean up game.cpp 
-Edit units to traverse a graph
+- Not urgent, just some commented code and old stuff from when code was first set up.
+Edit units to traverse hexes
+- Units should be capable of recieving a command to go in a direction relating to a hexagon.
+- Capable of validating the command to ensure they don't go anywhere invalid.
+- Each instance of a unit should represent a stack of units in one hex space. There should not be multiple instances of a players unit in one space.
+- Allow for units to merge if a stack moves into a player occupied space.
 Implement json reader for configuration
+- We will need to figure out what settings will be needed for the game
+- Any variables that would use the json for configuration should have a default value in the event of the configuration not being there.
+Set up game logic
+- Implement units fighting
+- Implement cities and taking over cities
+- 
+Map generation
+- Set up map using variables from configuration
+- map does not need to be uniform, there can be hexes that are not actually used in the game
+
