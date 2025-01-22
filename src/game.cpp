@@ -18,7 +18,7 @@ void Game::init() {
     running = true;
 
     // Create map
-    map = new Map(20, 15);
+    map = new Map(20, 20);
 
     // generated AI Code, maybe use later?
     // Initialize Lua
