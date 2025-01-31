@@ -6,6 +6,8 @@
 #include <SDL2/SDL.h>
 #include <lua.hpp>
 #include <string>
+#include <iostream>
+#include <queue>
 
 class Game {
 public:
@@ -17,6 +19,7 @@ public:
     void render();
     void clean();
 
+    bool validate_move(std::string command);
     bool isRunning() const { return running; }
 
 private:
@@ -25,11 +28,9 @@ private:
     bool running;
 
     Map* map;
-    Unit* playerUnit;
-    Unit* enemyUnit;
-    lua_State* L;
+    int round;
+    std::queue<std::string> actions;
 
-    std::string getAIAction(Unit* unit);
 };
 
 #endif

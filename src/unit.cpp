@@ -2,7 +2,10 @@
 
 #include "unit.h"
 
-Unit::Unit(int x, int y, int health, int attack) : x(x), y(y), health(health), attackPower(attack) {}
+Unit::Unit(int x, int y, int health, int attackRatio, int team) : x(x), y(y), health(health), team(team) {
+    hasMoved = false;
+    damage = health * attackRatio;
+}
 
 void Unit::render(SDL_Renderer* renderer) {
     if (health > 0) {
@@ -12,16 +15,39 @@ void Unit::render(SDL_Renderer* renderer) {
     }
 }
 
-// change to accomodate graph instead of grid
-void Unit::move(const std::string& direction, int mapWidth, int mapHeight) {
-    if (direction == "up" && y > 0) y--;
-    if (direction == "down" && y < mapHeight - 1) y++;
-    if (direction == "left" && x > 0) x--;
-    if (direction == "right" && x < mapWidth - 1) x++;
+bool Unit::move(int targetX, int targetY, Map& map) {
+
+    if (Unit::hasMoved) { 
+        std::cout << "Invalid action: This unit has already moved this turn" << std::endl; 
+        return -1; 
+    }
+
+    int distance = abs(targetX - x) + abs(targetY - y); 
+    if (distance > 5) { 
+        std::cout << "Invalid action: Can only move up to 5 tiles per turn" << std::endl; 
+        return -1; 
+    }
+
+    /*
+    if (!map.isValidTile(targetX, targetY)) { 
+        std::cout << "Invalid action: Selected tile is invalid" << std::endl; 
+        return -1; 
+    }
+    */
+
+    //map.setOccupied(x, y, false); 
+    x = targetX; 
+    y = targetY; 
+    //map.setOccupied(x, y, true); 
+    hasMoved = true;
+
+    std::cout << "Unit moved to (" << x << ", " << y << ")." << std::endl;
+    return 0;
+
 }
 
 void Unit::attack(Unit& target) {
-    target.health -= attackPower;
+    target.health -= damage;
 }
 
 int Unit::getX() const {
