@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <string>
+class MapTile;
 
 class Unit {
 public:
@@ -16,6 +17,7 @@ public:
     bool isAlive() const;
 
 private:
+    MapTile* tile;
     int x, y;
     int health;
     int attackPower;
