@@ -3,27 +3,32 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include "unit.h"
+#include "city.h"
 
 class MapTile {
 public:
-    MapTile(SDL_Color color);
-    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale);
+    MapTile(SDL_Color color, SDL_FPoint pos);
+    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth = 0);
+    // Contains all connections
+    std::vector<MapTile*> neighbors;
+    // Spanning tree children
+    std::vector<MapTile*> children;
 
 private:
+    SDL_FPoint pos;
     SDL_Color color;
+    Unit* unit;
+    City* city;
 };
 
 class Map {
 public:
-    Map(int width, int height);
+    Map(int width, int height, float connectedness = 1.0f);
     void render(SDL_Renderer* renderer);
-    bool isValidMove(int x, int y);
-    int dist(int fromX, int fromY, int toX, int toY);
-    float weightedDist(int fromX, int fromY, int toX, int toY);
 
 private:
-    int width, height;
-    std::vector<std::vector<MapTile>> grid;
+    MapTile* spanningTree;
 };
 
 #endif

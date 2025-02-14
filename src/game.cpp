@@ -1,13 +1,11 @@
 #include "game.h"
 //#include <iostream>
 
-Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr), playerUnit(nullptr), enemyUnit(nullptr), L(nullptr) {}
+Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr), L(nullptr) {}
 
 Game::~Game() {
     //lua_close(L);
     delete map;
-    delete playerUnit;
-    delete enemyUnit;
 }
 
 void Game::init() {
@@ -18,7 +16,7 @@ void Game::init() {
     running = true;
 
     // Create map
-    map = new Map(20, 20);
+    map = new Map(10, 10);
 
     // generated AI Code, maybe use later?
     // Initialize Lua
