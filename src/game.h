@@ -3,6 +3,7 @@
 
 #include "map.h"
 #include "unit.h"
+#include "player.h"
 #include <SDL2/SDL.h>
 #include <lua.hpp>
 #include <string>
@@ -25,9 +26,11 @@ private:
     bool running;
 
     Map* map;
-    Unit* playerUnit;
-    Unit* enemyUnit;
     lua_State* L;
+
+    int turnNumber;
+    int numPlayers;
+    std::vector<Player> players;
 
     std::string getAIAction(Unit* unit);
 };
