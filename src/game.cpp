@@ -1,5 +1,7 @@
 #include "game.h"
-
+// unit ids (1xx for team 1, 2xx for team 2)
+// figure out how data is stored and shared between lua and C
+// Shared pointers
 Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr) {}
 
 Game::~Game() {
@@ -41,32 +43,25 @@ void Game::update() {
 
     printf("Round %d begins...\n", Game::round);
 
-    
-
     while(command != "done"){
         printf("Enter command: ");
         getline(std::cin, command);
-
+        // validate move does nothing atm.
         bool move_status = Game::validate_move(command);
-        /* Not functional yet 
         if (command == "undo"){
             std::cout << "Reversing command: " << Game::actions.front() << std::endl;
-            Game::actions.pop();
-        } */
-
-        if ((move_status == true) && (command != "done")){
-            Game::actions.push(command);
+            Game::actions.pop_front();
+        } 
+        else if ((move_status == true) && (command != "done")){
+            Game::actions.push_front(command);
         }
-         
-        
     }
 
     printf("Now performing actions...\n");
 
     while(!Game::actions.empty()){
-        //printf("Running: %s\n", &Game::actions.front());
-        std::cout << "Runnning: " << Game::actions.front() << std::endl;
-        Game::actions.pop();
+        std::cout << "Runnning: " << Game::actions.back() << std::endl;
+        Game::actions.pop_back();
     }
 
     printf("Round %d is now complete.\n\n", Game::round);

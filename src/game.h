@@ -7,7 +7,7 @@
 #include <lua.hpp>
 #include <string>
 #include <iostream>
-#include <queue>
+#include <deque>
 
 class Game {
 public:
@@ -29,7 +29,7 @@ private:
 
     Map* map;
     int round;
-    std::queue<std::string> actions;
+    std::deque<std::string> actions;
 
 };
 
