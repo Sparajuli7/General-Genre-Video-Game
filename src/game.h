@@ -7,6 +7,8 @@
 #include <SDL2/SDL.h>
 #include <lua.hpp>
 #include <string>
+#include <iostream>
+#include <deque>
 
 class Game {
 public:
@@ -18,6 +20,7 @@ public:
     void render();
     void clean();
 
+    bool validate_move(std::string command);
     bool isRunning() const { return running; }
 
 private:
@@ -26,13 +29,16 @@ private:
     bool running;
 
     Map* map;
+    
+    std::deque<std::string> actions;
     lua_State* L;
 
-    int turnNumber;
+    int round;
     int numPlayers;
     std::vector<Player> players;
 
     std::string getAIAction(Unit* unit);
+
 };
 
 #endif

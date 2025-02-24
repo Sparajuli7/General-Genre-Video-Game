@@ -1,0 +1,23 @@
+// AI Code, maybe use later?
+    // Initialize Lua
+    /*
+    L = luaL_newstate();
+    luaL_openlibs(L);
+    luaL_dofile(L, "lua/ai.lua");
+    */
+/*
+std::string Game::getAIAction(Unit* unit) {
+    lua_getglobal(L, "decide_unit_action");
+    lua_pushlightuserdata(L, unit);
+    lua_pushlightuserdata(L, map);
+
+    if (lua_pcall(L, 3, 1, 0) != 0) {
+        std::cerr << "Error in Lua: " << lua_tostring(L, -1) << std::endl;
+        return "up";
+    }
+
+    std::string action = lua_tostring(L, -1);
+    lua_pop(L, 1);
+    return action;
+}
+*/
