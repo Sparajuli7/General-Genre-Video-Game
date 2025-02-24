@@ -3,6 +3,7 @@
 
 #include "map.h"
 #include "unit.h"
+#include "player.h"
 #include <SDL2/SDL.h>
 #include <lua.hpp>
 #include <string>
@@ -28,8 +29,15 @@ private:
     bool running;
 
     Map* map;
-    int round;
+    
     std::deque<std::string> actions;
+    lua_State* L;
+
+    int round;
+    int numPlayers;
+    std::vector<Player> players;
+
+    std::string getAIAction(Unit* unit);
 
 };
 

@@ -1,8 +1,10 @@
 #include "game.h"
+
 // unit ids (1xx for team 1, 2xx for team 2)
 // figure out how data is stored and shared between lua and C
 // Shared pointers
-Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr) {}
+
+Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr), L(nullptr) {}
 
 Game::~Game() {
 
@@ -21,8 +23,9 @@ void Game::init() {
     
 
     // Create map
-    Unit *testUnit = new Unit(0,0,10,1,0);
-    map = new Map(20, 20);
+
+    map = new Map(10, 10);
+
 
 
 }

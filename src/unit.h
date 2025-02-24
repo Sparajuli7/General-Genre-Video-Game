@@ -6,6 +6,9 @@
 #include <string>
 #include "map.h"
 
+class MapTile;
+
+
 class Unit {
 public:
     Unit(int x, int y, int health, int attack, int team);
@@ -19,6 +22,7 @@ public:
 
 private:
     int team;
+    MapTile* tile;
     int x, y;
     int health;
     int damage;
