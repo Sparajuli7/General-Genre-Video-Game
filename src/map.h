@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
-#include "unit.h"
 #include "city.h"
 
 class MapTile {
@@ -18,7 +17,6 @@ public:
 private:
     SDL_FPoint pos;
     SDL_Color color;
-    Unit* unit;
     City* city;
 };
 

@@ -13,11 +13,12 @@ class Unit {
 public:
     Unit(int x, int y, int health, int attack, int team);
     void render(SDL_Renderer* renderer);
-    bool move(int targetX, int targetY, Map& map);
+    bool move(int targetX, int targetY, Map &map);
     void attack(Unit& target);
     int getX() const;
     int getY() const;
     int getHealth() const;
+    int getAttack() const;
     bool isAlive() const;
 
 private:

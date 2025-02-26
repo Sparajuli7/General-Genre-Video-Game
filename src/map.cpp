@@ -1,8 +1,8 @@
-#include "map.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <stdlib.h>
 #include <iostream>
+#include "map.h"
 
 MapTile::MapTile(SDL_Color color, SDL_FPoint pos) : color(color), pos(pos) {
     return;

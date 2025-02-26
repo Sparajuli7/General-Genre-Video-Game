@@ -43,6 +43,7 @@ void Game::update() {
 
     Game::round++;
     std::string command = "";
+    bool move_status = false;
 
     printf("Round %d begins...\n", Game::round);
 
@@ -50,14 +51,28 @@ void Game::update() {
         printf("Enter command: ");
         getline(std::cin, command);
         // validate move does nothing atm.
-        bool move_status = Game::validate_move(command);
-        if (command == "undo"){
-            std::cout << "Reversing command: " << Game::actions.front() << std::endl;
-            Game::actions.pop_front();
-        } 
-        else if ((move_status == true) && (command != "done")){
-            Game::actions.push_front(command);
+
+        switch (convertToImmediate(command)) {
+            case ImmediateCommands::done:
+                break;
+            case ImmediateCommands::undo:
+                std::cout << "Reversing command: " << Game::actions.front() << std::endl;
+                Game::actions.pop_front();
+                break;
+            case ImmediateCommands::listmap: // Returns the map and provides info on what units and cities are in each tile
+                break;
+            case ImmediateCommands::listunit: // Returns the specified player's units
+                break;
+            case ImmediateCommands::listcity: // Returns the specified player's cities
+                break;
+            default:
+                move_status = Game::validate_move(command);
+                if ((move_status == true) && (command != "done")){
+                    Game::actions.push_front(command);
+                }
         }
+
+        
     }
 
     printf("Now performing actions...\n");
@@ -69,6 +84,15 @@ void Game::update() {
 
     printf("Round %d is now complete.\n\n", Game::round);
 
+}
+
+Game::ImmediateCommands Game::convertToImmediate(std::string command){
+    if (command == "done") return ImmediateCommands::done;
+    if (command == "undo") return ImmediateCommands::undo;
+    if (command == "listmap") return ImmediateCommands::listmap;
+    if (command == "listunit") return ImmediateCommands::listunit;
+    if (command == "listcity") return ImmediateCommands::listcity;
+    return ImmediateCommands::none;
 }
 
 bool Game::validate_move(std::string command){

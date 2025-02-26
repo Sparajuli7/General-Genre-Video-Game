@@ -21,12 +21,23 @@ public:
     void clean();
 
     bool validate_move(std::string command);
+    void listMap();
     bool isRunning() const { return running; }
 
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     bool running;
+
+    enum ImmediateCommands{
+        none = 0,
+        done = 1,
+        undo = 2,
+        listmap = 3,
+        listunit = 4,
+        listcity = 5
+    };
+    ImmediateCommands convertToImmediate(std::string command);
 
     Map* map;
     
@@ -38,6 +49,7 @@ private:
     std::vector<Player> players;
 
     std::string getAIAction(Unit* unit);
+
 
 };
 

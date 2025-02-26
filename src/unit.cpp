@@ -62,6 +62,10 @@ int Unit::getHealth() const {
     return health;
 }
 
+int Unit::getAttack() const {
+    return damage;
+}
+
 bool Unit::isAlive() const {
     return health > 0;
 }
