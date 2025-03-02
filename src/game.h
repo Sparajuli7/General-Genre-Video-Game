@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <deque>
+#include <sstream>
 
 class Game {
 public:
@@ -20,7 +21,7 @@ public:
     void render();
     void clean();
 
-    bool validate_move(std::string command);
+    bool validate_move(std::vector<std::string> command);
     void listMap();
     bool isRunning() const { return running; }
 
@@ -35,9 +36,18 @@ private:
         undo = 2,
         listmap = 3,
         listunit = 4,
-        listcity = 5
+        listcity = 5,
+        help = 6
     };
     ImmediateCommands convertToImmediate(std::string command);
+
+    enum GameCommands{
+        unknown = 0,
+        move = 1,
+        attack = 2,
+        makeunit = 3,
+    };
+    GameCommands convertToGame(std::string command);
 
     Map* map;
     

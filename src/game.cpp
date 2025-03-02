@@ -49,10 +49,18 @@ void Game::update() {
 
     while(command != "done"){
         printf("Enter command: ");
+        
         getline(std::cin, command);
-        // validate move does nothing atm.
+        std::string s;
+        std::stringstream ss(command);
+        std::vector<std::string> splitCommand;
+        // Splits Command by spaces
+        while (getline(ss, s, ' ')) {
+            // store token string in the vector
+            splitCommand.push_back(s);
+        }
 
-        switch (convertToImmediate(command)) {
+        switch (convertToImmediate(splitCommand[0])) {
             case ImmediateCommands::done:
                 break;
             case ImmediateCommands::undo:
@@ -65,9 +73,21 @@ void Game::update() {
                 break;
             case ImmediateCommands::listcity: // Returns the specified player's cities
                 break;
-            default:
-                move_status = Game::validate_move(command);
-                if ((move_status == true) && (command != "done")){
+            case ImmediateCommands::help:
+                std::cout << "\nGame Commands:\n"
+                    "done: Completes the turn and applies all actions to game.\n"
+                    "undo: Removes last action from queue.\n"
+                    "help: Prints this command list.\n"
+                    "listmap: Returns the map and coordinates of each tile.\n"
+                    "listunit [player number]: Returns the specified player's units\n"
+                    "listcity [player number]: Returns the specified player's cities\n"
+                    "move [unit id xxx] [tile coordinate]: Attempts to move the unit to the specified map tile. Can only move one tile per turn.\n"
+                    "attack [unit id xxx]: Attempts to attack an opposing player's unit if the specified unit is sharing a tile with one.\n"
+                    "makeunit [city id xxx]: Attempts to create a unit on the specified city. Can only be done once per turn.\n\n";
+                break;
+            case ImmediateCommands::none:
+                move_status = Game::validate_move(splitCommand); 
+                if ((move_status == true) && (splitCommand[0] != "done")){
                     Game::actions.push_front(command);
                 }
         }
@@ -92,11 +112,33 @@ Game::ImmediateCommands Game::convertToImmediate(std::string command){
     if (command == "listmap") return ImmediateCommands::listmap;
     if (command == "listunit") return ImmediateCommands::listunit;
     if (command == "listcity") return ImmediateCommands::listcity;
+    if (command == "help") return ImmediateCommands::help;
     return ImmediateCommands::none;
 }
 
-bool Game::validate_move(std::string command){
-    return true;
+Game::GameCommands Game::convertToGame(std::string command){
+    if (command == "move") return GameCommands::move;
+    if (command == "attack") return GameCommands::attack;
+    if (command == "makeunit") return GameCommands::makeunit;
+    return GameCommands::unknown;
+}
+
+bool Game::validate_move(std::vector<std::string> command){
+    switch (convertToGame(command[0]))
+    {
+    case GameCommands::move:
+        return true;
+    case GameCommands::attack:
+        return true;
+        break;
+    case GameCommands::makeunit:
+        return true;
+        break;
+    case GameCommands::unknown:
+        std::cout << "Unknown command, enter \"help\" for list of commands.\n";
+        return false;
+    }
+    return false;
 }
 
 void Game::render() {
