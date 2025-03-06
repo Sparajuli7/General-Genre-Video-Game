@@ -14,9 +14,11 @@ bool City::canCreateUnit() const {
 }
 
 // Creates a unit if allowed
-void City::createUnit() {
+Unit *City::createUnit() {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
+        // TODO: Need way to check if ID already exists.
+        // return Unit();
         // Logic to spawn a unit can be implemented here
         printf("Unit created by city with ID %d\n", id);
     } else {

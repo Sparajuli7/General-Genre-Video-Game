@@ -2,6 +2,7 @@
 #define CITY_H
 
 #include <SDL2/SDL.h>
+#include <unit.h>
 
 class MapTile;
 
@@ -17,7 +18,7 @@ public:
     bool canCreateUnit() const;
 
     // Create a unit if allowed
-    void createUnit();
+    Unit *createUnit();
 
     // Reset the turn status for unit creation
     void resetTurn();

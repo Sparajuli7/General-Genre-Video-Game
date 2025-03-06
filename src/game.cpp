@@ -19,6 +19,9 @@ void Game::init() {
     //renderer = SDL_CreateRenderer(window, -1, 0);
     running = true;
 
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+
     Game::round = 0;
     
 
@@ -26,7 +29,18 @@ void Game::init() {
 
     map = new Map(10, 10);
 
+    std::uniform_int_distribution<> distr(0, map->size());
 
+
+    MapTile *randTile = map->findNode(distr(gen));
+    cities.push_back(City(101, randTile));
+
+    randTile = map->findNode(distr(gen));
+    cities.push_back(City(201, randTile));
+
+    for( int i = 0; i < cities.size(); i++){
+        //cities[i].createUnit()
+    }
 
 }
 

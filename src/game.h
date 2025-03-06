@@ -6,6 +6,7 @@
 #include "player.h"
 #include <SDL2/SDL.h>
 #include <lua.hpp>
+#include <random>
 #include <string>
 #include <iostream>
 #include <deque>
@@ -50,6 +51,7 @@ private:
     GameCommands convertToGame(std::string command);
 
     Map* map;
+    std::vector<City> cities;
     
     std::deque<std::string> actions;
     lua_State* L;
