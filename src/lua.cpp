@@ -1,4 +1,5 @@
 #include "lua.hpp"
+#include "map.h"
 
 namespace lua {
 
@@ -28,6 +29,16 @@ int maptileDistance(lua_State* L) {
         lua_error(L);
     }
 
+    // Retrieve maptile uuids from lua stack
+    int from_uuid = luaL_checkinteger(L, 1);
+    int to_uuid = luaL_checkinteger(L, 2);
+
+    // TODO: insert call to MapTile.distance() here
+    int distance = 0;
+
+    // Push distance on to stack and return
+    lua_pushinteger(L, distance);
+ 
     return 1;
 }
 
@@ -43,6 +54,20 @@ int maptileNeighbors(lua_State* L) {
     if (n != 1) {
         lua_pushliteral(L, "incorrect number of arguments");
         lua_error(L);
+    }
+
+    // Retrieve maptile uuid from lua stack
+    int maptileId = luaL_checkinteger(L, 1);
+    // TODO: lookup maptile from uuid here
+    MapTile* maptile = nullptr;
+
+    // Create 1-indexed table with a list of neighboring maptile uuids
+    lua_newtable(L);
+    int i = 1;
+    for (auto &neighbor: maptile->neighbors) {
+        int neighborId = 0;
+        lua_pushinteger(L, neighborId);
+        lua_rawseti(L, i, 1);
     }
 
     return 1;
@@ -61,6 +86,16 @@ int maptileGetUnit(lua_State* L) {
         lua_pushliteral(L, "incorrect number of arguments");
         lua_error(L);
     }
+
+    // Retrieve maptile uuid from stack
+    int maptileId = luaL_checkinteger(L, 1);
+    // TODO: lookup maptile from uuid here
+    MapTile* maptile = nullptr;
+
+    // TODO: get unit
+    int unitId = 0;
+    lua_pushinteger(L, unitId)
+
     return 1;
 }
 
@@ -77,6 +112,15 @@ int maptileGetCity(lua_State* L) {
         lua_pushliteral(L, "incorrect number of arguments");
         lua_error(L);
     }
+
+    // Retrieve maptile uuid from stack
+    int maptileId = luaL_checkinteger(L, 1);
+    // TODO: lookup maptile from uuid here
+    MapTile* maptile = nullptr;
+
+    // TODO: get unit
+    int cityId = 0;
+    lua_pushinteger(L, cityId);
 
     return 1;
 }
@@ -95,6 +139,19 @@ int playerGetUnits(lua_State* L) {
         lua_error(L);
     }
 
+    // Retrieve player uuid from stack
+    int playerId = luaL_checkinteger(L, 1);
+    Player* player = nullptr;
+
+    // Create 1-indexed table with a list of neighboring maptile uuids
+    lua_newtable(L);
+    int i = 1;
+    for (auto &unit: player->units) {
+        int unitId = 0;
+        lua_pushinteger(L, unitId);
+        lua_rawseti(L, i, 1);
+    }
+
     return 1;
 }
 
@@ -110,6 +167,19 @@ int playerGetCities(lua_State* L) {
     if (n != 1) {
         lua_pushliteral(L, "incorrect number of arguments");
         lua_error(L);
+    }
+
+    // Retrieve player uuid from stack
+    int playerId = luaL_checkinteger(L, 1);
+    Player* player = nullptr;
+
+    // Push 1-indexed table with a list of city uuids owned by player
+    lua_newtable(L);
+    int i = 1;
+    for (auto &city: player->cities) {
+        int cityId = 0;
+        lua_pushinteger(L, cityId);
+        lua_rawseti(L, i, 1);
     }
 
     return 1;
