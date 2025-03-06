@@ -3,12 +3,15 @@
 
 #include <SDL2/SDL.h>
 #include <map>
+#include "map.h"
+#include "unit.h"
 
+/*
 class Unit;
 
 class MapTile;
 class Map;
-
+*/
 class City {
 public:
     // Constructor to initialize the city with an ID and its position on the map

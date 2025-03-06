@@ -29,7 +29,7 @@ Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
                 continue;
             }
             else{
-                return &Unit(i, health, attack, tile);
+                return new Unit(i, health, attack, tile);
             }
         }
         // TODO: Need way to check if ID already exists.

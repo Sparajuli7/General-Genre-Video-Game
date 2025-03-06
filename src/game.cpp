@@ -88,6 +88,7 @@ void Game::update() {
             case ImmediateCommands::listunit: // Returns the specified player's units
                 break;
             case ImmediateCommands::listcity: // Returns the specified player's cities
+                listCity();
                 break;
             case ImmediateCommands::help:
                 std::cout << "\nGame Commands:\n"
