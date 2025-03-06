@@ -21,6 +21,13 @@ lua_State* getInitialEnviron(const char script[]) {
  *      int: minimal distance between two maptiles
  */
 int maptileDistance(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 2) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -31,6 +38,13 @@ int maptileDistance(lua_State* L) {
  *      table: list of maptile UUIDs neighboring said maptile
  */
 int maptileNeighbors(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -41,6 +55,12 @@ int maptileNeighbors(lua_State* L) {
  *      int: UUID of unit on maptile, 0 if no unit found
  */
 int maptileGetUnit(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
     return 1;
 }
 
@@ -51,6 +71,13 @@ int maptileGetUnit(lua_State* L) {
  *      table: UUID of city on maptile, 0 if no city found
  */
 int maptileGetCity(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -61,6 +88,13 @@ int maptileGetCity(lua_State* L) {
  *      table: list of unit UUIDs owned by player
  */
 int playerGetUnits(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -71,6 +105,13 @@ int playerGetUnits(lua_State* L) {
  *      table: list of city UUIDs owned by player
  */
 int playerGetCities(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -81,6 +122,13 @@ int playerGetCities(lua_State* L) {
  *      table: list of player UUIDs
  */
 int getPlayers(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 0) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -91,6 +139,13 @@ int getPlayers(lua_State* L) {
  *      boolean: true if move is possible, false if move was rejected
  */
 int makeMove(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
@@ -101,6 +156,13 @@ int makeMove(lua_State* L) {
  *      boolean: true if move was undone, false if action queue was empty
  */
 int undoMove(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 0) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
     return 1;
 }
 
