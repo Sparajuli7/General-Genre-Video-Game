@@ -39,7 +39,9 @@ void Game::init() {
     cities.push_back(City(201, randTile));
 
     for( int i = 0; i < cities.size(); i++){
-        //cities[i].createUnit()
+        Unit *tempUnit = cities[i].createUnit(units, 10, 1);
+        units.insert({tempUnit->id, tempUnit});
+        cities[i].unitCreatedThisTurn = false;
     }
 
 }
@@ -128,6 +130,12 @@ Game::ImmediateCommands Game::convertToImmediate(std::string command){
     if (command == "listcity") return ImmediateCommands::listcity;
     if (command == "help") return ImmediateCommands::help;
     return ImmediateCommands::none;
+}
+
+void Game::listCity(){
+    for (int i = 0; i < cities.size(); i++){
+        std::cout << "City ID: " << cities[i].getID() << "  City Location: " << cities[i].getTileID() << std::endl;
+    }
 }
 
 Game::GameCommands Game::convertToGame(std::string command){

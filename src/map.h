@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <map>
-#include "city.h"
 
 class MapTile {
 public:
@@ -20,7 +19,6 @@ public:
 private:
     SDL_FPoint pos;
     SDL_Color color;
-    City* city;
 };
 
 class Map {

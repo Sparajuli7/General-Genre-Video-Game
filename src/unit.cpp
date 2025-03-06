@@ -1,4 +1,4 @@
-// Units have been removed from game.cpp until graph map is implemented
+
 
 #include "unit.h"
 

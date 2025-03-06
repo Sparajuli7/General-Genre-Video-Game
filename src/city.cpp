@@ -8,18 +8,33 @@ int City::getID() const {
     return id;
 }
 
+int City::getTileID() const{
+    return tile->uuid;
+}
+
 // Checks if the city is allowed to create a unit this turn
 bool City::canCreateUnit() const {
     return !unitCreatedThisTurn;
 }
 
 // Creates a unit if allowed
-Unit *City::createUnit() {
+Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
+        
+
+        for (int i = id+1; i < id+97; i++){
+            auto search = units.find(i);
+            if (search != units.end()){
+                continue;
+            }
+            else{
+                return &Unit(i, health, attack, tile);
+            }
+        }
         // TODO: Need way to check if ID already exists.
+        
         // return Unit();
-        // Logic to spawn a unit can be implemented here
         printf("Unit created by city with ID %d\n", id);
     } else {
         printf("City with ID %d has already created a unit this turn.\n", id);

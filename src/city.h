@@ -2,9 +2,12 @@
 #define CITY_H
 
 #include <SDL2/SDL.h>
-#include <unit.h>
+#include <map>
+
+class Unit;
 
 class MapTile;
+class Map;
 
 class City {
 public:
@@ -13,20 +16,22 @@ public:
 
     // Get the ID of the city
     int getID() const;
+    int getTileID() const;
 
     // Check if the city can create a unit this turn
+    bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
     bool canCreateUnit() const;
 
     // Create a unit if allowed
-    Unit *createUnit();
+    Unit *createUnit(std::map<int, Unit*> units, int health, int attack);
 
     // Reset the turn status for unit creation
     void resetTurn();
 
 private:
     int id; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
-    MapTile* tile; // Placeholder for map position
-    bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
+    MapTile* tile; 
+    
 };
 
 #endif
