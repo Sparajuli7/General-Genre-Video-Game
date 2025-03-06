@@ -33,15 +33,15 @@ void Game::init() {
 
 
     MapTile *randTile = map->findNode(distr(gen));
-    cities.push_back(City(101, randTile));
+    cities.insert({101, new City(101, randTile)});
 
     randTile = map->findNode(distr(gen));
-    cities.push_back(City(201, randTile));
+    cities.insert({201, new City(201, randTile)});
 
-    for( int i = 0; i < cities.size(); i++){
-        Unit *tempUnit = cities[i].createUnit(units, 10, 1);
+    for( auto itr = cities.begin(); itr != cities.end(); ++itr){
+        Unit *tempUnit = itr->second->createUnit(units, 10, 1);
         units.insert({tempUnit->id, tempUnit});
-        cities[i].unitCreatedThisTurn = false;
+        itr->second->unitCreatedThisTurn = false;
     }
 
 }
@@ -134,8 +134,8 @@ Game::ImmediateCommands Game::convertToImmediate(std::string command){
 }
 
 void Game::listCity(){
-    for (int i = 0; i < cities.size(); i++){
-        std::cout << "City ID: " << cities[i].getID() << "  City Location: " << cities[i].getTileID() << std::endl;
+    for (auto itr = cities.begin(); itr != cities.end(); ++itr){
+        std::cout << "City ID: " << itr->second->getID() << "  City Location: " << itr->second->getTileID() << std::endl;
     }
 }
 
@@ -146,13 +146,18 @@ Game::GameCommands Game::convertToGame(std::string command){
     return GameCommands::unknown;
 }
 
+
 bool Game::validate_move(std::vector<std::string> command){
     switch (convertToGame(command[0]))
     {
     case GameCommands::move:
         return true;
     case GameCommands::attack:
+        units.at(std::stoi(command[1]))->attack(*units.at(std::stoi(command[2])));
+        std::cout << "Current Health of Unit #" << units.at(std::stoi(command[2]))->id << " is now: " << units.at(std::stoi(command[2]))->getHealth() << std::endl;
         return true;
+        //code to delete a unit from the map.
+        //units.erase(target_id);
         break;
     case GameCommands::makeunit:
         return true;
@@ -165,14 +170,13 @@ bool Game::validate_move(std::vector<std::string> command){
 }
 
 void Game::render() {
-    /*
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
 
-    map->render(renderer);
+    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //SDL_RenderClear(renderer);
 
-    SDL_RenderPresent(renderer);
-    */
+    //map->render(renderer);
+
+    //SDL_RenderPresent(renderer);
 }
 
 void Game::clean() {

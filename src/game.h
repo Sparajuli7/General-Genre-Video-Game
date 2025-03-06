@@ -44,7 +44,7 @@ private:
     ImmediateCommands convertToImmediate(std::string command);
 
     void listMap();
-    void listUnit(int player);
+    void listUnit();
     void listCity();
 
     enum GameCommands{
@@ -56,7 +56,7 @@ private:
     GameCommands convertToGame(std::string command);
 
     Map* map;
-    std::vector<City> cities;
+    std::map<int, City*> cities;
     std::map<int, Unit*> units;
     
     std::deque<std::string> actions;
