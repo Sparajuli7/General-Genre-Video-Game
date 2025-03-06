@@ -1,5 +1,8 @@
 #include "lua.hpp"
 #include "map.h"
+#include "player.h"
+#include "unit.h"
+#include "city.h"
 
 namespace lua {
 
@@ -94,7 +97,7 @@ int maptileGetUnit(lua_State* L) {
 
     // TODO: get unit
     int unitId = 0;
-    lua_pushinteger(L, unitId)
+    lua_pushinteger(L, unitId);
 
     return 1;
 }
@@ -146,7 +149,7 @@ int playerGetUnits(lua_State* L) {
     // Create 1-indexed table with a list of neighboring maptile uuids
     lua_newtable(L);
     int i = 1;
-    for (auto &unit: player->units) {
+    for (auto &unit: player->getUnits()) {
         int unitId = 0;
         lua_pushinteger(L, unitId);
         lua_rawseti(L, i, 1);
@@ -176,7 +179,7 @@ int playerGetCities(lua_State* L) {
     // Push 1-indexed table with a list of city uuids owned by player
     lua_newtable(L);
     int i = 1;
-    for (auto &city: player->cities) {
+    for (auto &city: player->getCities()) {
         int cityId = 0;
         lua_pushinteger(L, cityId);
         lua_rawseti(L, i, 1);
@@ -192,6 +195,40 @@ int playerGetCities(lua_State* L) {
  *      table: list of player UUIDs
  */
 int getPlayers(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 0) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
+    return 1;
+}
+
+/* Get table of city UUIDs
+ * Takes:
+ *      Nothing
+ * Returns:
+ *      table: list of city UUIDs
+ */
+int getCities(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 0) {
+        lua_pushliteral(L, "incorrect number of arguments");
+        lua_error(L);
+    }
+
+    return 1;
+}
+
+/* Get table of unit UUIDs
+ * Takes:
+ *      Nothing
+ * Returns:
+ *      table: list of unit UUIDs
+ */
+int getUnits(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 0) {
@@ -244,6 +281,8 @@ static const struct luaL_Reg funcs[] = {
     {"playerGetUnits", playerGetUnits},
     {"playerGetCities", playerGetCities},
     {"getPlayers", getPlayers},
+    {"getCities", getCities},
+    {"getUnits", getUnits},
     {"makeMove", makeMove},
     {"undoMove", undoMove},
     {NULL, NULL}
