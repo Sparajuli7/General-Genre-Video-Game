@@ -28,8 +28,7 @@ int maptileDistance(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 2) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve maptile uuids from lua stack
@@ -55,8 +54,7 @@ int maptileNeighbors(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve maptile uuid from lua stack
@@ -86,8 +84,7 @@ int maptileGetUnit(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve maptile uuid from stack
@@ -112,8 +109,7 @@ int maptileGetCity(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve maptile uuid from stack
@@ -138,8 +134,7 @@ int playerGetUnits(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve player uuid from stack
@@ -168,8 +163,7 @@ int playerGetCities(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     // Retrieve player uuid from stack
@@ -198,8 +192,7 @@ int getPlayers(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 0) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     return 1;
@@ -215,8 +208,7 @@ int getCities(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 0) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     return 1;
@@ -232,8 +224,7 @@ int getUnits(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 0) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     return 1;
@@ -249,8 +240,7 @@ int makeMove(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     return 1;
@@ -266,8 +256,7 @@ int undoMove(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 0) {
-        lua_pushliteral(L, "incorrect number of arguments");
-        lua_error(L);
+        luaL_error(L, "Incorrect number of arguments");
     }
 
     return 1;
