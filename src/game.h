@@ -15,6 +15,7 @@
 #include <sstream>
 
 class Game {
+// TODO: A review is needed to ensure functions and variables are correctly set as public or private.
 public:
     Game();
     ~Game();
@@ -28,6 +29,7 @@ public:
     bool isRunning() const { return running; }
 
 private:
+    // Disable and enable rendering
     bool renderOn = false;
 
     SDL_Window* window;
@@ -58,6 +60,7 @@ private:
     };
     GameCommands convertToGame(std::string command);
 
+    // Some map structures will be moved to their respective class file soon.
     Map* map;
     std::map<int, City*> cities;
     std::map<int, Unit*> units;

@@ -2,6 +2,8 @@
 
 #include "unit.h"
 
+// TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
+
 Unit::Unit(int id, int health, int attackRatio, MapTile* tile) : id(id), health(health), tile(tile) {
     hasMoved = false;
     damage = health * attackRatio;
@@ -10,12 +12,14 @@ Unit::Unit(int id, int health, int attackRatio, MapTile* tile) : id(id), health(
 void Unit::render(SDL_Renderer* renderer) {
     if (health > 0) {
         // TODO: Change render logic to render based on location of current tile.
+        // Currently doesn't render unit location correctly.
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_Rect unitRect = { tile->getX() * 32, tile->getY() * 32, 32, 32 };
         SDL_RenderFillRect(renderer, &unitRect);
     }
 }
 
+// move is not implemented, currently only placeholder code.
 bool Unit::move(int targetX, int targetY, Map& map) {
 
     if (Unit::hasMoved) { 
@@ -43,6 +47,7 @@ bool Unit::move(int targetX, int targetY, Map& map) {
 
 }
 
+// To be expanded apon
 void Unit::attack(Unit& target) {
     target.health -= damage;
 }

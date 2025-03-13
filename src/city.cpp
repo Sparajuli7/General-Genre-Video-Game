@@ -8,6 +8,7 @@ int City::getID() const {
     return id;
 }
 
+// Returns the city's location on the map.
 int City::getTileID() const{
     return tile->uuid;
 }
@@ -22,7 +23,7 @@ Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
         
-
+        // Should work with multiple cities but isn't pretty.
         for (int i = id+1; i < id+97; i++){
             auto search = units.find(i);
             if (search != units.end()){
@@ -45,23 +46,3 @@ Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
 void City::resetTurn() {
     unitCreatedThisTurn = false;
 }
-
-/*this is the test to check if the code works:  Either copy and paste this test ib the file  game.cpp or create another test file: #include "city.h"
-#include <iostream>
-
-int main() {
-    MapTile* tile = nullptr; // Placeholder for now
-    City city1(101, tile); // City belonging to Team 1
-    City city2(202, tile); // City belonging to Team 2
-
-    std::cout << "City 1 ID: " << city1.getID() << std::endl;
-    std::cout << "City 2 ID: " << city2.getID() << std::endl;
-
-    city1.createUnit(); // Should create a unit
-    city1.createUnit(); // Should print that a unit was already created
-
-    city1.resetTurn();  // New turn
-    city1.createUnit(); // Should create a unit again
-
-    return 0;
-}*/

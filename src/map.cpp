@@ -53,7 +53,7 @@ Map::Map(int width, int height, float connectedness) {
         }
     }
 }
-
+// Returns a map tile using its UUID.
 MapTile* Map::findNode(int uuid){
     auto search = tilePTR.find(uuid);
     return search->second;
