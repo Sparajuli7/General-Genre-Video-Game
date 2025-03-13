@@ -17,13 +17,14 @@ class Unit {
 public:
     void render(SDL_Renderer* renderer);
     bool move(int targetX, int targetY, Map &map);
-    void attack(Unit& target);
+    void attackUnit(Uuid attackerUUID, Uuid targetUUID);
+    
     int getHealth() const;
     int getAttack() const;
     bool isAlive() const;
 
-    static Unit& makeUnit();
-    static const std::map<int, Unit>& getUnits() { return units; };
+    static Unit& makeUnit(Uuid uuid, int health, int attackRatio, MapTile* tile);
+    static std::map<int, Unit>& getUnits() { return units; };
 
 private:
     MapTile* tile;
@@ -32,8 +33,10 @@ private:
     bool hasMoved;
     const Uuid uuid;
 
+    void attack(Unit& target);
+
     Unit();
-    Unit(int x, int y, int health, int attack, int team);
+    Unit(Uuid uuid, int health, int attack, MapTile* tile);
     static inline std::map<int, Unit> units = std::map<int, Unit>();
 };
 

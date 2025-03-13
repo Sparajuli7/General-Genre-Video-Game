@@ -4,18 +4,17 @@
 #include <iostream>
 
 // Effectively the public constructor
-Unit& Unit::makeUnit() {
+Unit& Unit::makeUnit(Uuid uuid, int health, int attackRatio, MapTile* tile) {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
-    Unit unit = Unit();
+    Unit unit = Unit(uuid, health, attackRatio, tile);
     Unit::units.insert({unit.uuid, unit});
     return Unit::units.at(unit.uuid);
 }
 
-Unit::Unit() : uuid(Uuid()) {}
 
 // TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
 
-Unit::Unit(int id, int health, int attackRatio, MapTile* tile) : id(id), health(health), tile(tile) {
+Unit::Unit(Uuid uuid, int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(health), tile(tile) {
     hasMoved = false;
     damage = health * attackRatio;
 }
@@ -29,6 +28,48 @@ void Unit::render(SDL_Renderer* renderer) {
         SDL_RenderFillRect(renderer, &unitRect);
     }
 }
+
+/* HOLY MOLY */
+void Unit::attack(Unit& target) {
+    target.health -= damage;
+}
+
+void Unit::attackUnit(Uuid attackerUUID, Uuid targetUUID)
+{
+    // Makes sure attackerUUID exists
+    if (Unit::getUnits().find(attackerUUID) == Unit::getUnits().end()) {
+        std::cout << "Error: Attacker unit UUID " << attackerUUID << " does not exist!" << std::endl;
+        return;
+    }
+
+    // Making sure the target exists, same as above
+    if (Unit::getUnits().find(targetUUID) == Unit::getUnits().end()) {
+        std::cout << "Error: Target unit UUID " << targetUUID << " does not exist!" << std::endl;
+        return;
+    }
+
+    // Gets reference to attacker and target from map
+    Unit& attacker = Unit::getUnits().find(attackerUUID)->second;
+    Unit& target = Unit::getUnits().find(targetUUID)->second;
+
+    // Calls the attack
+    attacker.attack(target);
+
+    // Show remaining HP
+    std::cout << "Unit " << attackerUUID << " attacked unit " << targetUUID 
+            << "! Remaining HP: " << target.getHealth() << std::endl;
+
+    // See if unit is killed
+    if (!target.isAlive()) {
+        //Remove dead player from map
+        std::cout << "Unit " << targetUUID << " has been defeated and will be removed from the game." << std::endl;
+        Unit::getUnits().erase(int(targetUUID));
+    }
+}
+
+/* HOLY MOLY */
+
+
 
 // move is not implemented, currently only placeholder code.
 bool Unit::move(int targetX, int targetY, Map& map) {
@@ -58,10 +99,7 @@ bool Unit::move(int targetX, int targetY, Map& map) {
 
 }
 
-// To be expanded apon
-void Unit::attack(Unit& target) {
-    target.health -= damage;
-}
+
 
 int Unit::getHealth() const {
     return health;
