@@ -10,12 +10,12 @@
 
 class Player {
 public:
-    Player();
     void render(SDL_Renderer* renderer);
     void takeAction();
     std::vector<Unit> getUnits();
     std::vector<City> getCities();
 
+    static Player& makePlayer();
     static const std::map<int, Player> &getPlayers() { return players; };
 
 private:
@@ -24,7 +24,9 @@ private:
     MapTile* cursor;
     std::vector<Unit> units;
     std::vector<City> cities;
+    const Uuid uuid;
 
+    Player();
     static inline std::map<int, Player> players = std::map<int, Player>();
 };
 

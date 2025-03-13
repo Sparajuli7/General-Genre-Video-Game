@@ -1,6 +1,14 @@
 #include "player.h"
 
-Player::Player() {}
+// Effective public constructor
+Player& Player::makePlayer() {
+    // TODO: This feels dirty. I'm pretty sure there's a better way to do this
+    Player player = Player();
+    players.insert({player.uuid, player});
+    return players.at(player.uuid);
+}
+
+Player::Player() : uuid(Uuid()) {}
 
 // TODO: Actually make use of the Player class.
 void Player::render(SDL_Renderer* renderer) {

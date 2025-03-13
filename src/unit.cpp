@@ -1,14 +1,13 @@
 
 
 #include "unit.h"
-#include <iostream>
 
-// Effectively the public constructor
+// Effective public constructor
 Unit& Unit::makeUnit() {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
     Unit unit = Unit();
-    Unit::units.insert({unit.uuid, unit});
-    return Unit::units.at(unit.uuid);
+    units.insert({unit.uuid, unit});
+    return units.at(unit.uuid);
 }
 
 Unit::Unit() : uuid(Uuid()) {}

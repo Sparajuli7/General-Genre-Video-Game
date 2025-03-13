@@ -1,11 +1,21 @@
 #include "city.h"
 
+// Effective public constructor
+City& City::makeCity() {
+    // TODO: This feels dirty. I'm pretty sure there's a better way to do this
+    City city = City();
+    cities.insert({city.uuid, city});
+    return cities.at(city.uuid);
+}
+
+City::City() : uuid(Uuid()) {}
+
 // Constructor: Initializes the city with an ID and assigns its map position
-City::City(int id, MapTile* tile) : id(id), tile(tile), unitCreatedThisTurn(false) {}
+City::City(Uuid uuid, MapTile* tile) : uuid(uuid), tile(tile), unitCreatedThisTurn(false) {}
 
 // Returns the city's ID
 int City::getID() const {
-    return id;
+    return uuid;
 }
 
 // Returns the city's location on the map.
@@ -38,7 +48,7 @@ Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
         // return Unit();
         printf("Unit created by city with ID %d\n", id);
     } else {
-        printf("City with ID %d has already created a unit this turn.\n", id);
+        printf("City with ID %d has already created a unit this turn.\n", uuid);
     }
 }
 

@@ -23,7 +23,7 @@ public:
     bool isAlive() const;
 
     static Unit& makeUnit();
-    static const std::map<int, Unit>& getUnits() { return units; };
+    static const std::map<Uuid, Unit>& getUnits() { return units; };
 
 private:
     MapTile* tile;
@@ -34,7 +34,7 @@ private:
 
     Unit();
     Unit(int x, int y, int health, int attack, int team);
-    static inline std::map<int, Unit> units = std::map<int, Unit>();
+    static inline std::map<Uuid, Unit> units = std::map<Uuid, Unit>();
 };
 
 #endif
