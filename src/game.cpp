@@ -1,4 +1,5 @@
 #include "game.h"
+#include "lua.h"
 
 // unit ids (1xx for team 1, 2xx for team 2)
 // figure out how data is stored and shared between lua and C
@@ -26,7 +27,12 @@ void Game::init() {
 
     map = new Map(10, 10);
 
-
+    Unit::makeUnit();
+    Unit::makeUnit();
+    Unit::makeUnit();
+    Unit::makeUnit();
+    lua_State* L = lua::getInitialEnviron("lua/ai.lua");
+    lua::runAI(L, 0);
 
 }
 

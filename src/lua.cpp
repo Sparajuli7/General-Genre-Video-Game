@@ -4,6 +4,8 @@
 #include "unit.h"
 #include "city.h"
 
+#include <iostream>
+
 namespace lua {
 
 // Sets up an initial lua environment, loaded with the strategry library, along with a specified script file
@@ -12,6 +14,7 @@ lua_State* getInitialEnviron(const char script[]) {
 
     loadStrategyLibrary(L);
     luaL_dofile(L, script);
+    luaL_openlibs(L);
 
     // Ensure `think' function exists in provided script file
     if (lua_getglobal(L, "think") != LUA_TFUNCTION) {
@@ -73,7 +76,8 @@ int maptileNeighbors(lua_State* L) {
     for (auto &neighbor: maptile->neighbors) {
         int neighborId = 0;
         lua_pushinteger(L, neighborId);
-        lua_rawseti(L, i, 1);
+        lua_rawseti(L, 1, i);
+        i++;
     }
 
     return 1;
@@ -146,13 +150,14 @@ int playerGetUnits(lua_State* L) {
     int playerId = luaL_checkinteger(L, 1);
     Player* player = nullptr;
 
-    // Create 1-indexed table with a list of neighboring maptile uuids
+    // Push table with a list of neighboring maptile uuids
     lua_newtable(L);
     int i = 1;
     for (auto &unit: player->getUnits()) {
         int unitId = 0;
         lua_pushinteger(L, unitId);
-        lua_rawseti(L, i, 1);
+        lua_rawseti(L, 1, i);
+        i++;
     }
 
     return 1;
@@ -175,13 +180,14 @@ int playerGetCities(lua_State* L) {
     int playerId = luaL_checkinteger(L, 1);
     Player* player = nullptr;
 
-    // Push 1-indexed table with a list of city uuids owned by player
+    // Push table with a list of city uuids owned by player
     lua_newtable(L);
     int i = 1;
-    for (auto &city: player->getCities()) {
+    for (auto const &city: player->getCities()) {
         int cityId = 0;
         lua_pushinteger(L, cityId);
-        lua_rawseti(L, i, 1);
+        lua_rawseti(L, 1, i);
+        i++;
     }
 
     return 1;
@@ -200,6 +206,15 @@ int getPlayers(lua_State* L) {
         luaL_error(L, "Incorrect number of arguments");
     }
 
+    // Push table with a list of all player uuids
+    lua_newtable(L);
+    int i = 1;
+    for (auto const &[id, player]: Player::getPlayers()) {
+        lua_pushinteger(L, id);
+        lua_rawseti(L, 1, i);
+        i++;
+    }
+
     return 1;
 }
 
@@ -216,6 +231,15 @@ int getCities(lua_State* L) {
         luaL_error(L, "Incorrect number of arguments");
     }
 
+    // Push table with a list of all city uuids
+    lua_newtable(L);
+    int i = 1;
+    for (auto const &[id, city]: City::getCities()) {
+        lua_pushinteger(L, id);
+        lua_rawseti(L, 1, i);
+        i++;
+    }
+
     return 1;
 }
 
@@ -230,6 +254,15 @@ int getUnits(lua_State* L) {
     int n = lua_gettop(L);
     if (n != 0) {
         luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Push table with a list of all unit uuids
+    lua_newtable(L);
+    int i = 1;
+    for (auto const &[id, unit]: Unit::getUnits()) {
+        lua_pushinteger(L, id);
+        lua_rawseti(L, 1, i);
+        i++;
     }
 
     return 1;
@@ -294,6 +327,6 @@ void loadStrategyLibrary(lua_State* L) {
 void runAI(lua_State* L, int uuid) {
     lua_getglobal(L, "think");
     lua_pushinteger(L, uuid);
-    lua_call(L, 0, 0);
+    lua_call(L, 1, 0);
 }
 }

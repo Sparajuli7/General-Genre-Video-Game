@@ -1,6 +1,17 @@
 // Units have been removed from game.cpp until graph map is implemented
 
 #include "unit.h"
+#include <iostream>
+
+// Effectively the public constructor
+Unit& Unit::makeUnit() {
+    // TODO: This feels dirty. I'm pretty sure there's a better way to do this
+    Unit unit = Unit();
+    Unit::units.insert({unit.uuid, unit});
+    return Unit::units.at(unit.uuid);
+}
+
+Unit::Unit() : uuid(Uuid()) {}
 
 Unit::Unit(int x, int y, int health, int attackRatio, int team) : x(x), y(y), health(health), team(team) {
     hasMoved = false;
