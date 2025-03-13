@@ -28,6 +28,8 @@ public:
     bool isRunning() const { return running; }
 
 private:
+    bool renderOn = false;
+
     SDL_Window* window;
     SDL_Renderer* renderer;
     bool running;
@@ -39,7 +41,8 @@ private:
         listmap = 3,
         listunit = 4,
         listcity = 5,
-        help = 6
+        help = 6,
+        quit = 7
     };
     ImmediateCommands convertToImmediate(std::string command);
 

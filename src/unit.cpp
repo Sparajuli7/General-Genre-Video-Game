@@ -10,9 +10,9 @@ Unit::Unit(int id, int health, int attackRatio, MapTile* tile) : id(id), health(
 void Unit::render(SDL_Renderer* renderer) {
     if (health > 0) {
         // TODO: Change render logic to render based on location of current tile.
-        //SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        //SDL_Rect unitRect = { x * 32, y * 32, 32, 32 };
-        //SDL_RenderFillRect(renderer, &unitRect);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_Rect unitRect = { tile->getX() * 32, tile->getY() * 32, 32, 32 };
+        SDL_RenderFillRect(renderer, &unitRect);
     }
 }
 

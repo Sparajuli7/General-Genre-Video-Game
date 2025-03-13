@@ -9,6 +9,9 @@ class MapTile {
 public:
     MapTile(int uuid, SDL_Color color, SDL_FPoint pos);
     
+    float getX();
+    float getY();
+
     void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth = 0);
     // Contains all connections
     std::vector<MapTile*> neighbors;

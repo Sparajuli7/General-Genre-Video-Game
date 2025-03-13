@@ -9,14 +9,18 @@ Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr),
 Game::~Game() {
 
     delete map;
+    delete &units;
+    delete &cities;
 
 }
 
 void Game::init() {
     // Create SDL window and renderer
-    //SDL_Init(SDL_INIT_VIDEO);
-    //window = SDL_CreateWindow("Strategy Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
-    //renderer = SDL_CreateRenderer(window, -1, 0);
+    if (renderOn){
+        SDL_Init(SDL_INIT_VIDEO);
+        window = SDL_CreateWindow("Strategy Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
+        renderer = SDL_CreateRenderer(window, -1, 0);
+    }    
     running = true;
 
     std::random_device rd; // obtain a random number from hardware
@@ -102,6 +106,10 @@ void Game::update() {
                     "attack [unit id xxx]: Attempts to attack an opposing player's unit if the specified unit is sharing a tile with one.\n"
                     "makeunit [city id xxx]: Attempts to create a unit on the specified city. Can only be done once per turn.\n\n";
                 break;
+            case ImmediateCommands::quit:
+                Game::running = false;
+                command = "done";
+                break;
             case ImmediateCommands::none:
                 move_status = Game::validate_move(splitCommand); 
                 if ((move_status == true) && (splitCommand[0] != "done")){
@@ -130,6 +138,7 @@ Game::ImmediateCommands Game::convertToImmediate(std::string command){
     if (command == "listunit") return ImmediateCommands::listunit;
     if (command == "listcity") return ImmediateCommands::listcity;
     if (command == "help") return ImmediateCommands::help;
+    if (command == "quit") return ImmediateCommands::quit;
     return ImmediateCommands::none;
 }
 
@@ -171,16 +180,23 @@ bool Game::validate_move(std::vector<std::string> command){
 
 void Game::render() {
 
-    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    //SDL_RenderClear(renderer);
+    if (renderOn){
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
-    //map->render(renderer);
+        map->render(renderer);
+        for (auto itr = units.begin(); itr != units.end(); ++itr){
+            itr->second->render(renderer);
+        }
 
-    //SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer);
+    }
 }
 
 void Game::clean() {
-    //SDL_DestroyWindow(window);
-    //SDL_DestroyRenderer(renderer);
+    if(renderOn){
+        SDL_DestroyWindow(window);
+        SDL_DestroyRenderer(renderer);
+    }
     SDL_Quit();
 }

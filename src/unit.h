@@ -4,9 +4,10 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <string>
+#include "map.h"
 
-class MapTile;
-class Map;
+//class MapTile;
+//class Map;
 
 
 class Unit {

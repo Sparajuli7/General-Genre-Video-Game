@@ -8,6 +8,13 @@ MapTile::MapTile(int uuid, SDL_Color color, SDL_FPoint pos) : uuid(uuid), color(
     return;
 }
 
+float MapTile::getX(){
+    return pos.x;
+}
+float MapTile::getY(){
+    return pos.y;
+}
+
 Map::Map(int width, int height, float connectedness) {
     // Generate a grid of MapTiles
     std::vector<std::vector<MapTile*>> grid;
