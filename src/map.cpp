@@ -4,8 +4,15 @@
 #include <iostream>
 #include "map.h"
 
-MapTile::MapTile(SDL_Color color, SDL_FPoint pos) : color(color), pos(pos) {
+MapTile::MapTile(int uuid, SDL_Color color, SDL_FPoint pos) : uuid(uuid), color(color), pos(pos) {
     return;
+}
+
+float MapTile::getX(){
+    return pos.x;
+}
+float MapTile::getY(){
+    return pos.y;
 }
 
 Map::Map(int width, int height, float connectedness) {
@@ -17,7 +24,8 @@ Map::Map(int width, int height, float connectedness) {
             SDL_FPoint pos = { .x = (float) x * 3,
                                .y = (float) y * 3 };
             SDL_Color color = { 0x00, 0x00, 0xff, 0x00 };
-            MapTile* node = new MapTile(color, pos);
+            MapTile* node = new MapTile(y, color, pos);
+            tilePTR.insert({y, node});
             gridRow.push_back(node);
         }
         grid.push_back(gridRow);
@@ -44,6 +52,15 @@ Map::Map(int width, int height, float connectedness) {
             node = nextNode;
         }
     }
+}
+// Returns a map tile using its UUID.
+MapTile* Map::findNode(int uuid){
+    auto search = tilePTR.find(uuid);
+    return search->second;
+}
+
+int Map::size(){
+    return tilePTR.size();
 }
 
 void Map::render(SDL_Renderer* renderer) {

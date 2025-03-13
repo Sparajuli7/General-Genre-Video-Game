@@ -6,25 +6,23 @@
 #include <string>
 #include "map.h"
 
-class MapTile;
+//class MapTile;
+//class Map;
 
 
 class Unit {
 public:
-    Unit(int x, int y, int health, int attack, int team);
+    Unit(int id, int health, int attack, MapTile* tile);
+    int id;
     void render(SDL_Renderer* renderer);
     bool move(int targetX, int targetY, Map &map);
     void attack(Unit& target);
-    int getX() const;
-    int getY() const;
     int getHealth() const;
     int getAttack() const;
     bool isAlive() const;
 
 private:
-    int team;
     MapTile* tile;
-    int x, y;
     int health;
     int damage;
     bool hasMoved;
