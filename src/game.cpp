@@ -1,4 +1,5 @@
 #include "game.h"
+#include "lua.h"
 
 Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr), L(nullptr) {}
 
@@ -30,7 +31,6 @@ void Game::init() {
     map = new Map(5, 5);
 
     std::uniform_int_distribution<> distr(0, map->size());
-
 
     // Create two cities.
     MapTile *randTile = map->findNode(distr(gen));

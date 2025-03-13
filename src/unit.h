@@ -4,7 +4,10 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <string>
+#include <map>
+#include <memory>
 #include "map.h"
+#include "uuid.hpp"
 
 //class MapTile;
 //class Map;
@@ -12,8 +15,6 @@
 
 class Unit {
 public:
-    Unit(int id, int health, int attack, MapTile* tile);
-    int id;
     void render(SDL_Renderer* renderer);
     bool move(int targetX, int targetY, Map &map);
     void attack(Unit& target);
@@ -21,11 +22,19 @@ public:
     int getAttack() const;
     bool isAlive() const;
 
+    static Unit& makeUnit();
+    static const std::map<int, Unit>& getUnits() { return units; };
+
 private:
     MapTile* tile;
     int health;
     int damage;
     bool hasMoved;
+    const Uuid uuid;
+
+    Unit();
+    Unit(int x, int y, int health, int attack, int team);
+    static inline std::map<int, Unit> units = std::map<int, Unit>();
 };
 
 #endif

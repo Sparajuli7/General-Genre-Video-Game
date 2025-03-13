@@ -31,10 +31,12 @@ public:
     // Reset the turn status for unit creation
     void resetTurn();
 
+    static const std::map<int, City> &getCities() { return cities; };
+
 private:
     int id; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
     MapTile* tile; 
-    
+    static inline std::map<int, City> cities = std::map<int, City>();
 };
 
 #endif
