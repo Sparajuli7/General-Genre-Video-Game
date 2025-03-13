@@ -7,12 +7,17 @@
 namespace lua {
 
 // Sets up an initial lua environment, loaded with the strategry library, along with a specified script file
-// TODO: add error checking on script load, check for `think' function
 lua_State* getInitialEnviron(const char script[]) {
     lua_State* L = luaL_newstate();
 
     loadStrategyLibrary(L);
     luaL_dofile(L, script);
+
+    // Ensure `think' function exists in provided script file
+    if (lua_getglobal(L, "think") != LUA_TFUNCTION) {
+        std::cerr << "Think function does not exist in " << script << "!" << std::endl;
+        return nullptr;
+    }
 
     return L;
 }
