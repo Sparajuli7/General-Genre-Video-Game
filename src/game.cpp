@@ -6,8 +6,8 @@ Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr),
 Game::~Game() {
     // Currently this crashes the program
     delete map;
-    delete &units;
-    delete &cities;
+    //delete &units;
+    //delete &cities;
 
 }
 
@@ -41,8 +41,7 @@ void Game::init() {
 
     // Create one unit on each generated city.
     for( auto itr = cities.begin(); itr != cities.end(); ++itr){
-        Unit *tempUnit = itr->second->createUnit(units, 10, 1);
-        units.insert({tempUnit->id, tempUnit});
+        itr->second->createUnit(10, 1);
         itr->second->unitCreatedThisTurn = false;
     }
 
@@ -172,8 +171,8 @@ bool Game::validate_move(std::vector<std::string> command){
         return true;
     // TODO: Code made by Knox already, to be implemented and switched to primarly work within unit.cpp
     case GameCommands::attack:
-        units.at(std::stoi(command[1]))->attack(*units.at(std::stoi(command[2])));
-        std::cout << "Current Health of Unit #" << units.at(std::stoi(command[2]))->id << " is now: " << units.at(std::stoi(command[2]))->getHealth() << std::endl;
+        //units.at(std::stoi(command[1]))->attack(*units.at(std::stoi(command[2])));
+        //std::cout << "Current Health of Unit #" << units.at(std::stoi(command[2]))->id << " is now: " << units.at(std::stoi(command[2]))->getHealth() << std::endl;
         return true;
         //code to delete a unit from the map.
         //units.erase(target_id);
@@ -197,10 +196,12 @@ void Game::render() {
         SDL_RenderClear(renderer);
 
         map->render(renderer);
+        Unit::renderAll(renderer);
         // Renders every unit in the game.
-        for (auto itr = units.begin(); itr != units.end(); ++itr){
-            itr->second->render(renderer);
-        }
+        //std::map<int, Unit>  *units = Unit::getUnits();
+        //for (auto itr = units.begin(); itr != units.end(); ++itr){
+        //    itr->second->render(renderer);
+        //}
 
         SDL_RenderPresent(renderer);
     }

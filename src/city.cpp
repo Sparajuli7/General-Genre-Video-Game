@@ -19,9 +19,11 @@ bool City::canCreateUnit() const {
 }
 
 // Creates a unit if allowed
-Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
+Unit *City::createUnit(int health, int attack) {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
+
+        auto units = Unit::getUnits();
         
         // Should work with multiple cities but isn't pretty.
         for (int i = id+1; i < id+97; i++){
@@ -30,16 +32,19 @@ Unit *City::createUnit(std::map<int, Unit*> units, int health, int attack) {
                 continue;
             }
             else{
-                return new Unit(i, health, attack, tile);
+                printf("Unit created by city with ID %d\n", i);
+                return &Unit::makeUnit(i, health, attack, tile);
             }
         }
         // TODO: Need way to check if ID already exists.
         
         // return Unit();
-        printf("Unit created by city with ID %d\n", id);
+        
     } else {
         printf("City with ID %d has already created a unit this turn.\n", id);
+        return NULL;
     }
+    return NULL;
 }
 
 // Resets the turn status to allow unit creation next turn
