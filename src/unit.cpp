@@ -4,24 +4,24 @@
 #include <iostream>
 
 // Effectively the public constructor
-Unit& Unit::makeUnit(Uuid uuid, int health, int attackRatio, MapTile* tile) {
+Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile) {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
-    Unit unit = Unit(uuid, health, attackRatio, tile);
-    Unit::units.insert({unit.uuid, &unit});
-    return *Unit::units.at(unit.uuid);
+    Unit *unit = new Unit(health, attackRatio, tile);
+    Unit::units.insert({unit->uuid, unit});
+    return Unit::units.at(unit->uuid);
 }
 
 
 // TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
 
-Unit::Unit(Uuid uuid, int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(health), tile(tile) {
-    hasMoved = false;
+Unit::Unit(int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(health), tile(tile) {
+    moved = false;
     damage = health * attackRatio;
 }
 
 void Unit::renderAll(SDL_Renderer* renderer){
-    for (auto itr = units.begin(); itr != Unit::units.end(); ++itr){
-        itr->second->render(renderer);
+    for (auto const itr : units){
+        itr.second->render(renderer);
     }
 }
 
@@ -33,6 +33,59 @@ void Unit::render(SDL_Renderer* renderer) {
         SDL_Rect unitRect = { tile->getX() * 32.0, tile->getY() * 32.0, 32, 32 };
         SDL_RenderFillRect(renderer, &unitRect);
     }
+}
+
+bool Unit::move(Uuid movingUUID, int targetTileId, Map& map) {
+    
+    /*
+    auto search = units.find(movingUUID);
+
+    if (search == units.end()) {
+        std::cout << "Invalid action: Unit " << movingUUID.value << " does not exist." << std::endl;
+        return false;
+    }
+    
+    Unit *unit = search->second;
+
+    // Check if the unit has already moved this turn
+    if (unit->hasMoved()) {
+        std::cout << "Invalid action: Unit " << unit->getUUID() << " has already moved this turn." << std::endl;
+        return false;
+    }
+
+    // Check if the unit is trying to move to its current tile
+    if (unit->tile->uuid == targetTileId) {
+        std::cout << "Unit " << unit->getUUID() << " is already on tile " << targetTileId << "." << std::endl;
+        return false;
+    }
+
+    // Find the destination tile using the map
+    MapTile* targetTile = map.findNode(targetTileId);
+    if (!targetTile) {
+        std::cout << "Invalid action: Tile with ID " << targetTileId << " does not exist." << std::endl;
+        return false;
+    }
+
+    // Check if the target tile is a neighbor
+    bool isNeighbor = false;
+    for (MapTile* neighbor : unit->tile->neighbors) {
+        if (neighbor && neighbor->uuid == targetTileId) {
+            isNeighbor = true;
+            break;
+        }
+    }
+
+    if (!isNeighbor) {
+        std::cout << "Invalid action: Tile " << targetTileId << " is not adjacent to unit's current tile " << tile->uuid << "." << std::endl;
+        return false;
+    }
+
+    // Move the unit to the new tile
+    tile = targetTile;
+    unit->moved = true;
+    std::cout << "Unit " << unit->getUUID() << " moved to tile " << targetTileId << "." << std::endl;
+    return true;
+    */
 }
 
 /* HOLY MOLY */
@@ -75,35 +128,6 @@ void Unit::attackUnit(Uuid attackerUUID, Uuid targetUUID)
 
 /* HOLY MOLY */
 
-
-
-// move is not implemented, currently only placeholder code.
-bool Unit::move(int targetX, int targetY, Map& map) {
-
-    if (Unit::hasMoved) { 
-        std::cout << "Invalid action: This unit has already moved this turn" << std::endl; 
-        return -1; 
-    }
-
-    //int distance = abs(targetX - x) + abs(targetY - y); 
-    if (0) { 
-        std::cout << "Invalid action: Can only move up to 5 tiles per turn" << std::endl; 
-        return -1; 
-    }
-
-    /*
-    if (!map.isValidTile(targetX, targetY)) { 
-        std::cout << "Invalid action: Selected tile is invalid" << std::endl; 
-        return -1; 
-    }
-    */
-
-    hasMoved = true;
-
-    //std::cout << "Unit moved to (" << x << ", " << y << ")." << std::endl;
-    return 0;
-
-}
 
 
 

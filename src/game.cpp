@@ -89,6 +89,7 @@ void Game::update() {
             case ImmediateCommands::listmap: // Returns the map and provides info on what units and cities are in each tile
                 break;
             case ImmediateCommands::listunit: // Returns the specified player's units
+                listUnit();
                 break;
             case ImmediateCommands::listcity: // Returns the specified player's cities
                 listCity();
@@ -153,6 +154,12 @@ void Game::listCity(){
     }
 }
 
+void Game::listUnit(){
+    for (auto itr : Unit::getUnits()){
+        std::cout << "Unit ID: " << itr.second->getUUID() << "  Location: " << itr.second->getTileUUID() << "  Health & Attack: " <<  itr.second->getHealth() << ", " << itr.second->getAttack() << std::endl;
+    }
+}
+
 // Enum converter
 Game::GameCommands Game::convertToGame(std::string command){
     if (command == "move") return GameCommands::move;
@@ -168,6 +175,7 @@ bool Game::validate_move(std::vector<std::string> command){
     {
     // TODO: Will be implemented soon.
     case GameCommands::move:
+        Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map);
         return true;
     // TODO: Code made by Knox already, to be implemented and switched to primarly work within unit.cpp
     case GameCommands::attack:

@@ -33,7 +33,7 @@ Unit *City::createUnit(int health, int attack) {
             }
             else{
                 printf("Unit created by city with ID %d\n", i);
-                return &Unit::makeUnit(i, health, attack, tile);
+                return Unit::makeUnit(health, attack, tile);
             }
         }
         // TODO: Need way to check if ID already exists.
