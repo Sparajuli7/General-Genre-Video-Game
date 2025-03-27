@@ -26,7 +26,7 @@ public:
     bool canCreateUnit() const;
 
     // Create a unit if allowed
-    Unit *createUnit(std::map<int, Unit*> units, int health, int attack);
+    Unit *createUnit(int health, int attack);
 
     // Reset the turn status for unit creation
     void resetTurn();

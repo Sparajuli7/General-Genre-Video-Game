@@ -18,19 +18,54 @@ float MapTile::getY(){
 Map::Map(int width, int height, float connectedness) {
     // Generate a grid of MapTiles
     std::vector<std::vector<MapTile*>> grid;
+    int uuidCounter = 0;
     for (int x = 0; x < width; x++) {
         std::vector<MapTile*> gridRow;
-        for (int y = 0; y < width; y++) {
-            SDL_FPoint pos = { .x = (float) x * 3,
-                               .y = (float) y * 3 };
-            SDL_Color color = { 0x00, 0x00, 0xff, 0x00 };
-            MapTile* node = new MapTile(y, color, pos);
-            tilePTR.insert({y, node});
+        for (int y = 0; y < height; y++) {
+            // Adjust position for hex grid (offset every other row)
+            float offset = (y % 2 == 1) ? 1.5f : 0.0f;
+            SDL_FPoint pos = { .x = (float)x * 3.0f + offset, .y = (float)y * 2.598f }; // 2.598 = sqrt(3) * 1.5 for hex spacing
+            SDL_Color color = { 0x00, 0x00, 0xff, 0xff };
+            MapTile* node = new MapTile(uuidCounter++, color, pos);
+            tilePTR.insert({node->uuid, node});
             gridRow.push_back(node);
         }
         grid.push_back(gridRow);
     }
 
+    // Populate neighbors for each tile in a hex grid
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            MapTile* tile = grid[x][y];
+            tile->neighbors.resize(6, nullptr); // 6 possible neighbors in a hex grid
+
+            // Neighbor indices: 0 = NE, 1 = E, 2 = SE, 3 = SW, 4 = W, 5 = NW
+            bool isOddRow = (y % 2 == 1);
+            if (y % 2 == 0) { // Even rows
+                if (y > 0) {
+                    if (x < width - 1) tile->neighbors[0] = grid[x + 1][y - 1]; // NE
+                    tile->neighbors[5] = grid[x][y - 1]; // NW
+                }
+                if (x < width - 1) tile->neighbors[1] = grid[x + 1][y]; // E
+                if (y < height - 1) {
+                    if (x < width - 1) tile->neighbors[2] = grid[x + 1][y + 1]; // SE
+                    tile->neighbors[3] = grid[x][y + 1]; // SW
+                }
+                if (x > 0) tile->neighbors[4] = grid[x - 1][y]; // W
+            } else { // Odd rows
+                if (y > 0) {
+                    tile->neighbors[0] = grid[x][y - 1]; // NE
+                    if (x > 0) tile->neighbors[5] = grid[x - 1][y - 1]; // NW
+                }
+                if (x < width - 1) tile->neighbors[1] = grid[x + 1][y]; // E
+                if (y < height - 1) {
+                    tile->neighbors[2] = grid[x][y + 1]; // SE
+                    if (x > 0) tile->neighbors[3] = grid[x - 1][y + 1]; // SW
+                }
+                if (x > 0) tile->neighbors[4] = grid[x - 1][y]; // W
+            }
+        }
+    }
     // Zig zag through grid to create spanning tree
     // TODO: Implement breadth first search to do this instead
     // TODO: Probably better to have an intermediate representation where we directly work with edges

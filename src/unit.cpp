@@ -4,64 +4,132 @@
 #include <iostream>
 
 // Effectively the public constructor
-Unit& Unit::makeUnit() {
+Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile) {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
-    Unit unit = Unit();
-    Unit::units.insert({unit.uuid, unit});
-    return Unit::units.at(unit.uuid);
+    Unit *unit = new Unit(health, attackRatio, tile);
+    Unit::units.insert({unit->uuid, unit});
+    return Unit::units.at(unit->uuid);
 }
 
-Unit::Unit() : uuid(Uuid()) {}
 
 // TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
 
-Unit::Unit(int id, int health, int attackRatio, MapTile* tile) : id(id), health(health), tile(tile) {
-    hasMoved = false;
+Unit::Unit(int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(health), tile(tile) {
+    moved = false;
     damage = health * attackRatio;
+}
+
+void Unit::renderAll(SDL_Renderer* renderer){
+    for (auto const itr : units){
+        itr.second->render(renderer);
+    }
 }
 
 void Unit::render(SDL_Renderer* renderer) {
     if (health > 0) {
         // TODO: Change render logic to render based on location of current tile.
-        // Currently doesn't render unit location correctly.
+        // Currently crashes on the line that uses tiles, need to see why this is happening.
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect unitRect = { tile->getX() * 32, tile->getY() * 32, 32, 32 };
+        SDL_Rect unitRect = { tile->getX() * 32.0, tile->getY() * 32.0, 32, 32 };
         SDL_RenderFillRect(renderer, &unitRect);
     }
 }
 
-// move is not implemented, currently only placeholder code.
-bool Unit::move(int targetX, int targetY, Map& map) {
-
-    if (Unit::hasMoved) { 
-        std::cout << "Invalid action: This unit has already moved this turn" << std::endl; 
-        return -1; 
-    }
-
-    //int distance = abs(targetX - x) + abs(targetY - y); 
-    if (0) { 
-        std::cout << "Invalid action: Can only move up to 5 tiles per turn" << std::endl; 
-        return -1; 
-    }
-
+bool Unit::move(Uuid movingUUID, int targetTileId, Map& map) {
+    
     /*
-    if (!map.isValidTile(targetX, targetY)) { 
-        std::cout << "Invalid action: Selected tile is invalid" << std::endl; 
-        return -1; 
+    auto search = units.find(movingUUID);
+
+    if (search == units.end()) {
+        std::cout << "Invalid action: Unit " << movingUUID.value << " does not exist." << std::endl;
+        return false;
     }
+    
+    Unit *unit = search->second;
+
+    // Check if the unit has already moved this turn
+    if (unit->hasMoved()) {
+        std::cout << "Invalid action: Unit " << unit->getUUID() << " has already moved this turn." << std::endl;
+        return false;
+    }
+
+    // Check if the unit is trying to move to its current tile
+    if (unit->tile->uuid == targetTileId) {
+        std::cout << "Unit " << unit->getUUID() << " is already on tile " << targetTileId << "." << std::endl;
+        return false;
+    }
+
+    // Find the destination tile using the map
+    MapTile* targetTile = map.findNode(targetTileId);
+    if (!targetTile) {
+        std::cout << "Invalid action: Tile with ID " << targetTileId << " does not exist." << std::endl;
+        return false;
+    }
+
+    // Check if the target tile is a neighbor
+    bool isNeighbor = false;
+    for (MapTile* neighbor : unit->tile->neighbors) {
+        if (neighbor && neighbor->uuid == targetTileId) {
+            isNeighbor = true;
+            break;
+        }
+    }
+
+    if (!isNeighbor) {
+        std::cout << "Invalid action: Tile " << targetTileId << " is not adjacent to unit's current tile " << tile->uuid << "." << std::endl;
+        return false;
+    }
+
+    // Move the unit to the new tile
+    tile = targetTile;
+    unit->moved = true;
+    std::cout << "Unit " << unit->getUUID() << " moved to tile " << targetTileId << "." << std::endl;
+    return true;
     */
-
-    hasMoved = true;
-
-    //std::cout << "Unit moved to (" << x << ", " << y << ")." << std::endl;
-    return 0;
-
 }
 
-// To be expanded apon
+/* HOLY MOLY */
 void Unit::attack(Unit& target) {
     target.health -= damage;
 }
+
+void Unit::attackUnit(Uuid attackerUUID, Uuid targetUUID)
+{
+    // Makes sure attackerUUID exists
+    if (Unit::getUnits().find(attackerUUID) == Unit::getUnits().end()) {
+        std::cout << "Error: Attacker unit UUID " << attackerUUID << " does not exist!" << std::endl;
+        return;
+    }
+
+    // Making sure the target exists, same as above
+    if (Unit::getUnits().find(targetUUID) == Unit::getUnits().end()) {
+        std::cout << "Error: Target unit UUID " << targetUUID << " does not exist!" << std::endl;
+        return;
+    }
+
+    // Gets reference to attacker and target from map
+    Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
+    Unit *target = Unit::getUnits().find(targetUUID)->second;
+
+    // Calls the attack
+    attacker->attack(*target);
+
+    // Show remaining HP
+    std::cout << "Unit " << attackerUUID << " attacked unit " << targetUUID 
+            << "! Remaining HP: " << target->getHealth() << std::endl;
+
+    // See if unit is killed
+    if (!target->isAlive()) {
+        //Remove dead player from map
+        std::cout << "Unit " << targetUUID << " has been defeated and will be removed from the game." << std::endl;
+        Unit::getUnits().erase(int(targetUUID));
+    }
+}
+
+/* HOLY MOLY */
+
+
+
 
 int Unit::getHealth() const {
     return health;

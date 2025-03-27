@@ -30,7 +30,7 @@ public:
 
 private:
     // Disable and enable rendering
-    bool renderOn = false;
+    bool renderOn = true;
 
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -63,7 +63,7 @@ private:
     // Some map structures will be moved to their respective class file soon.
     Map* map;
     std::map<int, City*> cities;
-    std::map<int, Unit*> units;
+    //std::map<int, Unit*> units;
     
     std::deque<std::string> actions;
     lua_State* L;

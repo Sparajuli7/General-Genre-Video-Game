@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lua5.4/lua.hpp>
+#include </usr/include/lua.hpp>
 
 namespace lua {
     lua_State* getInitialEnviron(const char script[]);
