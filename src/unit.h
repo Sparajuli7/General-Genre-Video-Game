@@ -32,7 +32,7 @@ public:
     MapTile* getTile() const { return tile; } // Getter for current tile
 
     static Unit* makeUnit(int health, int attackRatio, MapTile* tile);
-    static std::map<int, Unit*>& getUnits() { return units; };
+    static std::map<Uuid, Unit*>& getUnits() { return units; };
 
 private:
     MapTile* tile;
@@ -45,7 +45,7 @@ private:
 
     Unit();
     Unit(int health, int attack, MapTile* tile);
-    static inline std::map<int, Unit*> units = std::map<int, Unit*>();
+    static inline std::map<Uuid, Unit*> units = std::map<Uuid, Unit*>();
 };
 
 #endif

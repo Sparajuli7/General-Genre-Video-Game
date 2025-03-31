@@ -3,12 +3,11 @@
 #include "unit.h"
 #include <iostream>
 
-// Effectively the public constructor
+// Effective public constructor. Inserts created unit into unit map
 Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile) {
-    // TODO: This feels dirty. I'm pretty sure there's a better way to do this
-    Unit *unit = new Unit(health, attackRatio, tile);
-    Unit::units.insert({unit->uuid, unit});
-    return Unit::units.at(unit->uuid);
+    Unit* unit = new Unit(health, attackRatio, tile);
+    units.insert({unit->uuid, unit});
+    return unit;
 }
 
 
