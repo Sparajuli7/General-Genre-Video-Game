@@ -6,17 +6,8 @@
 #include "map.h"
 #include "unit.h"
 
-/*
-class Unit;
-
-class MapTile;
-class Map;
-*/
 class City {
 public:
-    // Constructor to initialize the city with an ID and its position on the map
-    City(int id, MapTile* tile);
-
     // Get the ID of the city
     int getID() const;
     int getTileID() const;
@@ -31,12 +22,14 @@ public:
     // Reset the turn status for unit creation
     void resetTurn();
 
-    static const std::map<int, City> &getCities() { return cities; };
+    static City* makeCity(MapTile* tile);
+    static const std::map<int, City*> &getCities() { return cities; };
 
 private:
-    int id; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
-    MapTile* tile; 
-    static inline std::map<int, City> cities = std::map<int, City>();
+    const Uuid uuid;
+    City(MapTile* tile);
+    MapTile* tile;
+    static inline std::map<int, City*> cities = std::map<int, City*>();
 };
 
 #endif

@@ -34,10 +34,10 @@ void Game::init() {
 
     // Create two cities.
     MapTile *randTile = map->findNode(distr(gen));
-    cities.insert({101, new City(101, randTile)});
+    City::makeCity(randTile);
 
     randTile = map->findNode(distr(gen));
-    cities.insert({201, new City(201, randTile)});
+    City::makeCity(randTile);
 
     // Create one unit on each generated city.
     for( auto itr = cities.begin(); itr != cities.end(); ++itr){

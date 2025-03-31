@@ -10,22 +10,24 @@
 
 class Player {
 public:
-    Player();
     void render(SDL_Renderer* renderer);
     void takeAction();
-    std::vector<Unit> getUnits();
-    std::vector<City> getCities();
+    std::vector<Unit*> getUnits();
+    std::vector<City*> getCities();
 
-    static const std::map<int, Player> &getPlayers() { return players; };
+    static Player* makePlayer();
+    static const std::map<Uuid, Player*> &getPlayers() { return players; };
 
 private:
+    Player();
     lua_State* L;
     bool isBot;
     MapTile* cursor;
-    std::vector<Unit> units;
-    std::vector<City> cities;
+    std::vector<Unit*> units;
+    std::vector<City*> cities;
+    const Uuid uuid;
 
-    static inline std::map<int, Player> players = std::map<int, Player>();
+    static inline std::map<Uuid, Player*> players = std::map<Uuid, Player*>();
 };
 
 #endif

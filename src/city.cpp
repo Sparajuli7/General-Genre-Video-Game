@@ -1,11 +1,18 @@
 #include "city.h"
 
+// Effective public constructor. Inserts created city into city map
+City* City::makeCity(MapTile* tile) {
+    City* city = new City(tile);
+    cities.insert({city->uuid, city});
+    return city;
+}
+
 // Constructor: Initializes the city with an ID and assigns its map position
-City::City(int id, MapTile* tile) : id(id), tile(tile), unitCreatedThisTurn(false) {}
+City::City(MapTile* tile) : uuid(Uuid()), tile(tile), unitCreatedThisTurn(false) {}
 
 // Returns the city's ID
 int City::getID() const {
-    return id;
+    return uuid;
 }
 
 // Returns the city's location on the map.
@@ -26,7 +33,7 @@ Unit *City::createUnit(int health, int attack) {
         auto units = Unit::getUnits();
         
         // Should work with multiple cities but isn't pretty.
-        for (int i = id+1; i < id+97; i++){
+        for (int i = uuid+1; i < uuid+97; i++){
             auto search = units.find(i);
             if (search != units.end()){
                 continue;
@@ -41,7 +48,7 @@ Unit *City::createUnit(int health, int attack) {
         // return Unit();
         
     } else {
-        printf("City with ID %d has already created a unit this turn.\n", id);
+        printf("City with ID %d has already created a unit this turn.\n", uuid);
         return NULL;
     }
     return NULL;
