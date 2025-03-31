@@ -4,10 +4,11 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <map>
+#include "uuid.hpp"
 
 class MapTile {
 public:
-    MapTile(int uuid, SDL_Color color, SDL_FPoint pos);
+    MapTile(SDL_Color color, SDL_FPoint pos);
     
     float getX();
     float getY();
@@ -17,11 +18,13 @@ public:
     std::vector<MapTile*> neighbors;
     // Spanning tree children
     std::vector<MapTile*> children;
-    int uuid;
+    const Uuid uuid;
 
 private:
     SDL_FPoint pos;
     SDL_Color color;
+
+    static inline std::map<Uuid, MapTile*> maptiles = std::map<Uuid, MapTile*>();
 };
 
 class Map {
@@ -31,7 +34,7 @@ public:
     MapTile *findNode(int uuid);
     int size();
     void render(SDL_Renderer* renderer);
-    std::map<int, MapTile*> tilePTR;
+    std::map<Uuid, MapTile*> tilePTR;
 
 private:
     MapTile* spanningTree;

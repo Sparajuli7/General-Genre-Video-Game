@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <iostream>
 #include "map.h"
+#include "uuid.hpp"
 
-MapTile::MapTile(int uuid, SDL_Color color, SDL_FPoint pos) : uuid(uuid), color(color), pos(pos) {
+MapTile::MapTile(SDL_Color color, SDL_FPoint pos) : uuid(Uuid()), color(color), pos(pos) {
     return;
 }
 
@@ -26,7 +27,7 @@ Map::Map(int width, int height, float connectedness) {
             float offset = (y % 2 == 1) ? 1.5f : 0.0f;
             SDL_FPoint pos = { .x = (float)x * 3.0f + offset, .y = (float)y * 2.598f }; // 2.598 = sqrt(3) * 1.5 for hex spacing
             SDL_Color color = { 0x00, 0x00, 0xff, 0xff };
-            MapTile* node = new MapTile(uuidCounter++, color, pos);
+            MapTile* node = new MapTile(color, pos);
             tilePTR.insert({node->uuid, node});
             gridRow.push_back(node);
         }

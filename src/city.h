@@ -23,13 +23,15 @@ public:
     void resetTurn();
 
     static City* makeCity(MapTile* tile);
-    static const std::map<int, City*> &getCities() { return cities; };
+    static const std::map<Uuid, City*> &getCities() { return cities; };
 
 private:
     const Uuid uuid;
     City(MapTile* tile);
+    ~City();
     MapTile* tile;
-    static inline std::map<int, City*> cities = std::map<int, City*>();
+
+    static inline std::map<Uuid, City*> cities = std::map<Uuid, City*>();
 };
 
 #endif

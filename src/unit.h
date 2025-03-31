@@ -44,6 +44,7 @@ private:
     void attack(Unit& target);
 
     Unit();
+    ~Unit();
     Unit(int health, int attack, MapTile* tile);
     static inline std::map<Uuid, Unit*> units = std::map<Uuid, Unit*>();
 };

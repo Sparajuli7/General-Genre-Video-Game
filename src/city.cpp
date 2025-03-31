@@ -10,6 +10,10 @@ City* City::makeCity(MapTile* tile) {
 // Constructor: Initializes the city with an ID and assigns its map position
 City::City(MapTile* tile) : uuid(Uuid()), tile(tile), unitCreatedThisTurn(false) {}
 
+City::~City() {
+    cities.erase(this->uuid);
+}
+
 // Returns the city's ID
 int City::getID() const {
     return uuid;

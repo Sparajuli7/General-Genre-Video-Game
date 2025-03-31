@@ -18,6 +18,10 @@ Unit::Unit(int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(he
     damage = health * attackRatio;
 }
 
+Unit::~Unit() {
+    units.erase(this->uuid);
+}
+
 void Unit::renderAll(SDL_Renderer* renderer){
     for (auto const itr : units){
         itr.second->render(renderer);
@@ -85,6 +89,7 @@ bool Unit::move(Uuid movingUUID, int targetTileId, Map& map) {
     std::cout << "Unit " << unit->getUUID() << " moved to tile " << targetTileId << "." << std::endl;
     return true;
     */
+    return true;
 }
 
 /* HOLY MOLY */

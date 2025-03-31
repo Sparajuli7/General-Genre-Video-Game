@@ -20,6 +20,7 @@ public:
 
 private:
     Player();
+    ~Player();
     lua_State* L;
     bool isBot;
     MapTile* cursor;
