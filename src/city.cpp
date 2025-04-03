@@ -1,15 +1,20 @@
 #include "city.h"
 
-City* City::makeCity(MapTile* tile){
-    City *city = new City(tile);
-    City::cities.insert({city->uuid, city});
 
-    return City::cities.at(city->uuid);
+// Effective public constructor. Inserts created city into city map
+City* City::makeCity(MapTile* tile) {
+    City* city = new City(tile);
+    cities.insert({city->uuid, city});
+    return city;
 }
 
 // Constructor: Initializes the city with an ID and assigns its map position
 City::City(MapTile* tile) : uuid(Uuid()), tile(tile), unitCreatedThisTurn(false) {}
 
+// Returns the city's ID
+int City::getID() const {
+    return uuid;
+}
 
 // Checks if the city is allowed to create a unit this turn
 bool City::canCreateUnit() const {
@@ -21,11 +26,11 @@ Unit *City::createUnit(int health, int attack) {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
         
-        
         auto unit = Unit::makeUnit(health, attack, tile);
 
         printf("Unit created by city with ID %d\n", unit->getUUID());
         return unit;
+
         // TODO: Need way to check if ID already exists.
         
         // return Unit();

@@ -1,6 +1,13 @@
 #include "player.h"
 
-Player::Player() {}
+// Effective public constructor. Inserts created player into player map
+Player* Player::makePlayer() {
+    Player* player = new Player();
+    players.insert({player->uuid, player});
+    return player;
+}
+
+Player::Player() : uuid(Uuid()) {}
 
 // TODO: Actually make use of the Player class.
 void Player::render(SDL_Renderer* renderer) {

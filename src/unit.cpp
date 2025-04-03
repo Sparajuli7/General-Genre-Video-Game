@@ -3,7 +3,7 @@
 #include "unit.h"
 #include <iostream>
 
-// Effectively the public constructor
+// Effective public constructor. Inserts created unit into unit map
 Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile) {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
     Unit *unit = new Unit(health, attackRatio, tile);

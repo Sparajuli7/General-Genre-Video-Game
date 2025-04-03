@@ -6,12 +6,6 @@
 #include "map.h"
 #include "unit.h"
 
-/*
-class Unit;
-
-class MapTile;
-class Map;
-*/
 class City {
 public:
     // Constructor to initialize the city with an ID and its position on the map
@@ -35,12 +29,13 @@ public:
     void resetTurn();
 
     static City* makeCity(MapTile* tile);
-    static std::map<int, City*> &getCities() { return cities; };
+  
+    static const std::map<int, City*> &getCities() { return cities; };
 
 private:
-    const Uuid uuid; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
-    MapTile* tile; 
-
+    const Uuid uuid;
+    City(MapTile* tile);
+    MapTile* tile;
     static inline std::map<int, City*> cities = std::map<int, City*>();
 };
 
