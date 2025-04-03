@@ -46,7 +46,7 @@ void Game::init() {
 
     // Create one unit on each generated city.
     for( auto const itr : City::getCities()){
-        itr.second->createUnit(10, 1);
+        City::createUnit(itr.second->getUUID(), 10, 1);
         itr.second->unitCreatedThisTurn = false;
     }
 
@@ -195,7 +195,11 @@ bool Game::validate_move(std::vector<std::string> command){
         break;
     // TODO: Implement makeunit code
     case GameCommands::makeunit:
-        return true;
+    if (command.size() < 2){
+        std::cout << "Error: Missing arguments.\n";
+        return false;
+    }
+        return City::createUnit(std::stoi(command[1]), 10, 10);
         break;
     case GameCommands::unknown:
         std::cout << "Unknown command, enter \"help\" for list of commands.\n";

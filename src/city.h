@@ -8,8 +8,6 @@
 
 class City {
 public:
-    // Constructor to initialize the city with an ID and its position on the map
-    City(MapTile* tile);
 
     static void renderAll(SDL_Renderer* renderer);
     void render(SDL_Renderer* renderer);
@@ -23,7 +21,7 @@ public:
     bool canCreateUnit() const;
 
     // Create a unit if allowed
-    Unit *createUnit(int health, int attack);
+    static bool createUnit(int cityUUID, int health, int attack);
 
     // Reset the turn status for unit creation
     void resetTurn();

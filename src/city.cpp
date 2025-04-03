@@ -11,35 +11,40 @@ City* City::makeCity(MapTile* tile) {
 // Constructor: Initializes the city with an ID and assigns its map position
 City::City(MapTile* tile) : uuid(Uuid()), tile(tile), unitCreatedThisTurn(false) {}
 
-// Returns the city's ID
-int City::getID() const {
-    return uuid;
-}
-
 // Checks if the city is allowed to create a unit this turn
 bool City::canCreateUnit() const {
     return !unitCreatedThisTurn;
 }
 
 // Creates a unit if allowed
-Unit *City::createUnit(int health, int attack) {
-    if (!unitCreatedThisTurn) {
-        unitCreatedThisTurn = true;
+bool City::createUnit(int cityUUID, int health, int attack) {
+    
+    auto search = cities.find(cityUUID);
+
+    if (search == cities.end()) {
+        std::cout << "Invalid action: Unit " << cityUUID << " does not exist." << std::endl;
+        return false;
+    }
+    
+    City *city = search->second;
+    
+    if (!city->unitCreatedThisTurn) {
+        city->unitCreatedThisTurn = true;
         
-        auto unit = Unit::makeUnit(health, attack, tile);
+        auto unit = Unit::makeUnit(health, attack, city->tile);
 
         printf("Unit created by city with ID %d\n", unit->getUUID());
-        return unit;
+        return true;
 
         // TODO: Need way to check if ID already exists.
         
         // return Unit();
         
     } else {
-        printf("City with ID %d has already created a unit this turn.\n", uuid);
-        return NULL;
+        printf("City with ID %d has already created a unit this turn.\n", city->uuid);
+        return false;
     }
-    return NULL;
+    return false;
 }
 
 // Resets the turn status to allow unit creation next turn
