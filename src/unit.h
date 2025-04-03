@@ -17,8 +17,8 @@ class Unit {
 public:
     static void renderAll(SDL_Renderer* renderer);
     void render(SDL_Renderer* renderer);
-    static bool move(Uuid movingUUID, int targetTileId, Map& map);
-    void attackUnit(Uuid attackerUUID, Uuid targetUUID);
+    static bool move(int movingUUID, int targetTileId, Map& map);
+    static bool attackUnit(int attackerUUID, int targetUUID);
     
     int getHealth() const;
     int getAttack() const;
@@ -40,6 +40,7 @@ private:
     int damage;
     bool moved;
     const Uuid uuid;
+    //Player player;
 
     void attack(Unit& target);
 

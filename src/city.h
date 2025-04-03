@@ -8,9 +8,15 @@
 
 class City {
 public:
+    // Constructor to initialize the city with an ID and its position on the map
+    City(MapTile* tile);
+
+    static void renderAll(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer);
+
     // Get the ID of the city
-    int getID() const;
-    int getTileID() const;
+    int getUUID() const { return uuid; } // Getter for id
+    int getTileUUID() const { return tile->uuid; }
 
     // Check if the city can create a unit this turn
     bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
@@ -23,6 +29,7 @@ public:
     void resetTurn();
 
     static City* makeCity(MapTile* tile);
+  
     static const std::map<int, City*> &getCities() { return cities; };
 
 private:

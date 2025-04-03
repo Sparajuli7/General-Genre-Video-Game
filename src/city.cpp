@@ -1,5 +1,6 @@
 #include "city.h"
 
+
 // Effective public constructor. Inserts created city into city map
 City* City::makeCity(MapTile* tile) {
     City* city = new City(tile);
@@ -15,11 +16,6 @@ int City::getID() const {
     return uuid;
 }
 
-// Returns the city's location on the map.
-int City::getTileID() const{
-    return tile->uuid;
-}
-
 // Checks if the city is allowed to create a unit this turn
 bool City::canCreateUnit() const {
     return !unitCreatedThisTurn;
@@ -29,20 +25,12 @@ bool City::canCreateUnit() const {
 Unit *City::createUnit(int health, int attack) {
     if (!unitCreatedThisTurn) {
         unitCreatedThisTurn = true;
-
-        auto units = Unit::getUnits();
         
-        // Should work with multiple cities but isn't pretty.
-        for (int i = uuid+1; i < uuid+97; i++){
-            auto search = units.find(i);
-            if (search != units.end()){
-                continue;
-            }
-            else{
-                printf("Unit created by city with ID %d\n", i);
-                return Unit::makeUnit(health, attack, tile);
-            }
-        }
+        auto unit = Unit::makeUnit(health, attack, tile);
+
+        printf("Unit created by city with ID %d\n", unit->getUUID());
+        return unit;
+
         // TODO: Need way to check if ID already exists.
         
         // return Unit();
@@ -57,4 +45,19 @@ Unit *City::createUnit(int health, int attack) {
 // Resets the turn status to allow unit creation next turn
 void City::resetTurn() {
     unitCreatedThisTurn = false;
+}
+
+void City::renderAll(SDL_Renderer* renderer){
+    for (auto const itr : cities){
+        itr.second->render(renderer);
+    }
+}
+
+void City::render(SDL_Renderer* renderer) {
+    // TODO: Change render logic to render based on location of current tile.
+    // Currently crashes on the line that uses tiles, need to see why this is happening.
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect cityRect = { tile->getX() * 30 + 15, tile->getY() * 30 + 45, 28, 10 };
+    SDL_RenderFillRect(renderer, &cityRect);
+    
 }

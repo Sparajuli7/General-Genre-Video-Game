@@ -15,6 +15,11 @@ void Game::init() {
     // Create SDL window and renderer
     if (renderOn){
         SDL_Init(SDL_INIT_VIDEO);
+        TTF_Init();
+        font = TTF_OpenFont("Swansea-q3pd.ttf", 18);
+        if (!font) {
+            std::cout << "Uh oh!! Font missing!!" << std::endl;
+        }
         window = SDL_CreateWindow("Strategy Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
         renderer = SDL_CreateRenderer(window, -1, 0);
     }    
@@ -33,16 +38,16 @@ void Game::init() {
     std::uniform_int_distribution<> distr(0, map->size());
 
     // Create two cities.
-    MapTile *randTile = map->findNode(distr(gen));
-    City::makeCity(randTile);
+    //MapTile *randTile = map->findNode(distr(gen));
 
-    randTile = map->findNode(distr(gen));
-    City::makeCity(randTile);
+    City::makeCity(map->findNode(0));
+
+    City::makeCity(map->findNode(map->size()-1));
 
     // Create one unit on each generated city.
-    for( auto itr = cities.begin(); itr != cities.end(); ++itr){
-        itr->second->createUnit(10, 1);
-        itr->second->unitCreatedThisTurn = false;
+    for( auto const itr : City::getCities()){
+        itr.second->createUnit(10, 1);
+        itr.second->unitCreatedThisTurn = false;
     }
 
 }
@@ -149,8 +154,8 @@ Game::ImmediateCommands Game::convertToImmediate(std::string command){
 
 // Simply lists the cities with their ID and location on the map.
 void Game::listCity(){
-    for (auto itr = cities.begin(); itr != cities.end(); ++itr){
-        std::cout << "City ID: " << itr->second->getID() << "  City Location: " << itr->second->getTileID() << std::endl;
+    for (auto const itr : City::getCities() ){
+        std::cout << "City ID: " << itr.second->getUUID() << "  City Location: " << itr.second->getTileUUID() << std::endl;
     }
 }
 
@@ -175,15 +180,18 @@ bool Game::validate_move(std::vector<std::string> command){
     {
     // TODO: Will be implemented soon.
     case GameCommands::move:
-        Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map);
-        return true;
-    // TODO: Code made by Knox already, to be implemented and switched to primarly work within unit.cpp
+        if (command.size() < 3){
+            std::cout << "Error: Missing arguments.\n";
+            return false;
+        }
+        return Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map);
+        break;
     case GameCommands::attack:
-        //units.at(std::stoi(command[1]))->attack(*units.at(std::stoi(command[2])));
-        //std::cout << "Current Health of Unit #" << units.at(std::stoi(command[2]))->id << " is now: " << units.at(std::stoi(command[2]))->getHealth() << std::endl;
-        return true;
-        //code to delete a unit from the map.
-        //units.erase(target_id);
+        if (command.size() < 3){
+            std::cout << "Error: Missing arguments.\n";
+            return false;
+        }
+        return Unit::attackUnit(std::stoi(command[1]), std::stoi(command[2]));
         break;
     // TODO: Implement makeunit code
     case GameCommands::makeunit:
@@ -203,8 +211,9 @@ void Game::render() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        map->render(renderer);
+        map->render(renderer, font);
         Unit::renderAll(renderer);
+        City::renderAll(renderer);
         // Renders every unit in the game.
         //std::map<int, Unit>  *units = Unit::getUnits();
         //for (auto itr = units.begin(); itr != units.end(); ++itr){

@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
     // Game logic is in a different thread, while rendering is on this one.
     std::thread thread_obj(gameLogic, &game);
     while (game.isRunning()) {
+        game.handleEvents();
         game.render();
         SDL_Delay(100);
     }
@@ -26,7 +27,6 @@ int main(int argc, char* argv[]) {
 
 void gameLogic(Game *game){
     while (game->isRunning()) {
-        game->handleEvents();
         game->update();
         SDL_Delay(100);
     }

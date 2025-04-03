@@ -98,12 +98,39 @@ int Map::size(){
     return tilePTR.size();
 }
 
-void Map::render(SDL_Renderer* renderer) {
-    this->spanningTree->render(renderer, {-1.0f, -1.0f}, 20.0f);
+void MapTile::renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y) {
+    // Create surface from text
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, text.c_str(), color);
+    if (!textSurface) {
+        // Handle error
+        return;
+    }
+
+    // Create texture from surface
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (!textTexture) {
+        // Handle error
+        SDL_FreeSurface(textSurface);
+        return;
+    }
+
+    // Set up the destination rectangle
+    SDL_Rect destRect = {x, y, textSurface->w, textSurface->h};
+
+    // Render the texture
+    SDL_RenderCopy(renderer, textTexture, NULL, &destRect);
+
+    // Clean up
+    SDL_DestroyTexture(textTexture);
+    SDL_FreeSurface(textSurface);
+    }
+
+void Map::render(SDL_Renderer* renderer, TTF_Font* font) {
+    this->spanningTree->render(renderer, {-1.0f, -1.0f}, 30.0f, 0, font);
 }
 
 //
-void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth) {
+void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth, TTF_Font* font) {
     // TODO: Creating the hexagon each iteration shouldn't be necessary
     // Create array of hexagonally distributed vertices
     const int numVertices = 6;
@@ -113,6 +140,8 @@ void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int de
                                       .y = scale * (this->pos.y - pos.y + sin(i * M_PI / 3)) },
                         .color = this->color };
     }
+    
+    
 
     // Create four triangles which cover the surface of the hexagon
     const int numTriangles = 4;
@@ -126,11 +155,15 @@ void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int de
 
     // Render hexagon to the screen
     SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
+    
+    std::string text = std::to_string(this->uuid);
+
+    renderText(renderer, font, text, {255,255,255} , vertices[0].position.x, vertices[0].position.y);
 
     // Recursively render children
     for (MapTile* child : this->children) {
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLine(renderer, scale * (this->pos.x - pos.x), scale * (this->pos.y - pos.y), scale * (child->pos.x - pos.x), scale * (child->pos.y - pos.y));
-        child->render(renderer, pos, scale, depth + 1);
+        child->render(renderer, pos, scale, depth + 1, font);
     }
 }
