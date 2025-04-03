@@ -15,11 +15,14 @@ class Map;
 class City {
 public:
     // Constructor to initialize the city with an ID and its position on the map
-    City(int id, MapTile* tile);
+    City(MapTile* tile);
+
+    static void renderAll(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer);
 
     // Get the ID of the city
-    int getID() const;
-    int getTileID() const;
+    int getUUID() const { return uuid; } // Getter for id
+    int getTileUUID() const { return tile->uuid; }
 
     // Check if the city can create a unit this turn
     bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
@@ -31,12 +34,14 @@ public:
     // Reset the turn status for unit creation
     void resetTurn();
 
-    static const std::map<int, City> &getCities() { return cities; };
+    static City* makeCity(MapTile* tile);
+    static std::map<int, City*> &getCities() { return cities; };
 
 private:
-    int id; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
+    const Uuid uuid; // City ID indicating team ownership (1xx for team 1, 2xx for team 2)
     MapTile* tile; 
-    static inline std::map<int, City> cities = std::map<int, City>();
+
+    static inline std::map<int, City*> cities = std::map<int, City*>();
 };
 
 #endif

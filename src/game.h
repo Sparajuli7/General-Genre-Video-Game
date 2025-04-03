@@ -6,6 +6,8 @@
 #include "unit.h"
 #include "player.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <map>
 #include <lua.hpp>
 #include <random>
@@ -34,6 +36,7 @@ private:
 
     SDL_Window* window;
     SDL_Renderer* renderer;
+    TTF_Font* font;
     bool running;
 
     enum ImmediateCommands{
