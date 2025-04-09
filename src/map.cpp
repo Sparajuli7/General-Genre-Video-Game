@@ -154,16 +154,18 @@ void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int de
     }
 
     // Render hexagon to the screen
-    SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
+    
     
     std::string text = std::to_string(this->uuid);
 
-    renderText(renderer, font, text, {255,255,255} , vertices[0].position.x, vertices[0].position.y);
+    renderText(renderer, font, text, {255,255,255} , vertices[0].position.x-2, vertices[0].position.y+10);
 
     // Recursively render children
     for (MapTile* child : this->children) {
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
         SDL_RenderDrawLine(renderer, scale * (this->pos.x - pos.x), scale * (this->pos.y - pos.y), scale * (child->pos.x - pos.x), scale * (child->pos.y - pos.y));
+        
         child->render(renderer, pos, scale, depth + 1, font);
     }
+    SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
 }

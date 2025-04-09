@@ -1,21 +1,23 @@
 
 
 #include "unit.h"
+#include "city.h"
+#include "player.h"
 #include <iostream>
 
 // Effective public constructor. Inserts created unit into unit map
-Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile) {
+Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile, Player* owner) {
     // TODO: This feels dirty. I'm pretty sure there's a better way to do this
-    Unit *unit = new Unit(health, attackRatio, tile);
+    Unit *unit = new Unit(health, attackRatio, tile, owner);
     Unit::units.insert({unit->uuid, unit});
-    
+    owner->addUnit(unit);
     return Unit::units.at(unit->uuid);
 }
 
 
 // TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
 
-Unit::Unit(int health, int attackRatio, MapTile* tile) : uuid(Uuid()), health(health), tile(tile) {
+Unit::Unit(int health, int attackRatio, MapTile* tile, Player* owner) : uuid(Uuid()), health(health), tile(tile), owner(owner) {
     moved = false;
     damage = health * attackRatio;
 }
@@ -31,7 +33,7 @@ void Unit::render(SDL_Renderer* renderer) {
         // TODO: Change render logic to render based on location of current tile.
         // Currently crashes on the line that uses tiles, need to see why this is happening.
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect unitRect = { tile->getX() * 30 + 12, tile->getY() * 30 + 12, 20, 26 };
+        SDL_Rect unitRect = { tile->getX() * 30 + 10 + (Unit::owner->getUUID()*21), tile->getY() * 30 + 12, 20, 26 };
         SDL_RenderFillRect(renderer, &unitRect);
     }
 }
@@ -80,6 +82,13 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map) {
         return false;
     }
 
+    for (auto itr : unit->owner->getUnits()){
+        if (itr->getTileUUID() == targetTileId){
+            std::cout << "Invalid action: Tile " << targetTileId << " already has your unit " << itr->getUUID() << "on it." << std::endl;
+            return false;
+        }
+    }
+
     // Move the unit to the new tile
     unit->tile = targetTile;
     unit->moved = true;
@@ -102,13 +111,40 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID)
 
     // Making sure the target exists, same as above
     if (Unit::getUnits().find(targetUUID) == Unit::getUnits().end()) {
-        std::cout << "Error: Target unit UUID " << targetUUID << " does not exist!" << std::endl;
-        return false;
+        std::cout << "Error: Target unit UUID " << targetUUID << " does not exist! Trying city capture." << std::endl;
+        // Check if target is city, perform city actions
+        std::map<int, City*> cities = City::getCities();
+        if (cities.find(targetUUID) == cities.end()){
+            std::cout << "Error: Target city UUID " << targetUUID << " does not exist!" << std::endl;
+            return false;
+        }
+        else {
+            Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
+            City *target = cities.find(targetUUID)->second;
+            if(target->getOwner() == attacker->getOwner()){
+                std::cout << "Error: Cannot capture city on the same team!" << std::endl;
+                return false;
+            }
+            else{
+            Player* oldOwner = target->getOwner();
+            oldOwner->removeCity(target);
+            target->setOwner(attacker->getOwner());
+            attacker->getOwner()->addCity(target);
+            std::cout << "City " << target->getUUID() << " captured!\n";
+            return true;
+            }
+        }
+        
     }
 
     // Gets reference to attacker and target from map
     Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
     Unit *target = Unit::getUnits().find(targetUUID)->second;
+
+    if (attacker->getOwner() == target->getOwner()){
+        std::cout << "Error: Cannot attack units on the same team!" << std::endl;
+        return false;
+    }
 
     // Calls the attack
     attacker->attack(*target);

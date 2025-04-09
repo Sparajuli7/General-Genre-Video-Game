@@ -30,6 +30,8 @@ void Game::init() {
 
     Game::round = 0;
     
+    Player* player1 = Player::makePlayer();
+    Player* player2 = Player::makePlayer();
 
     // Create map
 
@@ -40,9 +42,9 @@ void Game::init() {
     // Create two cities.
     //MapTile *randTile = map->findNode(distr(gen));
 
-    City::makeCity(map->findNode(0));
+    City::makeCity(map->findNode(0), player1);
 
-    City::makeCity(map->findNode(map->size()-1));
+    City::makeCity(map->findNode(map->size()-22), player2);
 
     // Create one unit on each generated city.
     for( auto const itr : City::getCities()){
@@ -207,6 +209,24 @@ bool Game::validate_move(std::vector<std::string> command){
     }
     return false;
 }
+
+void Game::checkVictoryCondition() {
+    int alivePlayers = 0;
+    Player* potentialWinner = nullptr;
+
+    for (auto itr : Player::getPlayers()) {
+        if (!itr.second->isDefeated()) {
+            alivePlayers++;
+            potentialWinner = itr.second;
+        }
+    }
+
+    if (alivePlayers == 1) {
+        std::cout << "Player " << potentialWinner->getUUID() << " has won the game!\n";
+        running = false;
+    }
+}
+
 
 // TODO: Render the rest of the game objects like cities
 void Game::render() {

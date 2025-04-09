@@ -9,6 +9,9 @@
 #include "map.h"
 #include "uuid.hpp"
 
+class City;
+class Player;
+
 //class MapTile;
 //class Map;
 
@@ -31,8 +34,11 @@ public:
     int getTileUUID() const { return tile->uuid; }
     MapTile* getTile() const { return tile; } // Getter for current tile
 
-    static Unit* makeUnit(int health, int attackRatio, MapTile* tile);
+    static Unit* makeUnit(int health, int attackRatio, MapTile* tile, Player* owner);
     static std::map<int, Unit*>& getUnits() { return units; };
+
+    Player* getOwner() const { return owner; };
+    void setOwner(Player* player) { owner = player; };
 
 private:
     MapTile* tile;
@@ -40,12 +46,12 @@ private:
     int damage;
     bool moved;
     const Uuid uuid;
-    //Player player;
+    Player *owner;
 
     void attack(Unit& target);
 
     Unit();
-    Unit(int health, int attack, MapTile* tile);
+    Unit(int health, int attack, MapTile* tile, Player* owner);
     static inline std::map<int, Unit*> units = std::map<int, Unit*>();
 };
 

@@ -5,6 +5,9 @@
 #include <map>
 #include "map.h"
 #include "unit.h"
+//#include "player.h"
+
+class Player;
 
 class City {
 public:
@@ -26,15 +29,20 @@ public:
     // Reset the turn status for unit creation
     void resetTurn();
 
-    static City* makeCity(MapTile* tile);
+    static City* makeCity(MapTile* tile, Player* owner);
   
     static const std::map<int, City*> &getCities() { return cities; };
 
+    Player* getOwner() const { return owner; };
+    void setOwner(Player* player) { owner = player; };
+
 private:
     const Uuid uuid;
-    City(MapTile* tile);
+    City(MapTile* tile, Player* owner);
     MapTile* tile;
     static inline std::map<int, City*> cities = std::map<int, City*>();
+    Player* owner;  // add to private section
+
 };
 
 #endif

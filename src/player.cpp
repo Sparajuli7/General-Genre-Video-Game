@@ -1,4 +1,7 @@
 #include "player.h"
+#include "unit.h"  
+#include "city.h"   
+#include "map.h"
 
 // Effective public constructor. Inserts created player into player map
 Player* Player::makePlayer() {

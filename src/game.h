@@ -77,6 +77,8 @@ private:
 
     std::string getAIAction(Unit* unit);
 
+    void checkVictoryCondition();
+
 
 };
 

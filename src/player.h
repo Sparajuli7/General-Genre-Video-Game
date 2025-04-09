@@ -3,10 +3,17 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "lua.hpp"
-#include "unit.h"
-#include "city.h"
+//#include "unit.h"
+//#include "city.h"
 #include "map.h"
+#include "uuid.hpp"
+
+class Unit;
+class City;
+//class MapTile;
+
 
 class Player {
 public:
@@ -17,6 +24,23 @@ public:
 
     static Player* makePlayer();
     static const std::map<Uuid, Player*> &getPlayers() { return players; };
+
+    const Uuid getUUID() { return uuid; };
+
+    void addCity(City* city) { cities.push_back(city); }
+    void addUnit(Unit* unit) { units.push_back(unit); };
+
+    const void removeCity(City* city) {
+        Player::cities.erase(std::remove(cities.begin(), cities.end(), city), cities.end());
+    }
+
+    const void removeUnit(Unit* unit) {
+        Player::units.erase(std::remove(units.begin(), units.end(), unit), units.end());
+    }
+
+    bool isDefeated() const { return cities.empty(); }
+
+
 
 private:
     Player();
