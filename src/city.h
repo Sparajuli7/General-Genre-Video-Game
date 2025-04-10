@@ -24,7 +24,7 @@ public:
     bool canCreateUnit() const;
 
     // Create a unit if allowed
-    static bool createUnit(int cityUUID, int health, int attack);
+    static bool createUnit(int cityUUID, int health, int attack, Player* currentPlayer);
 
     // Reset the turn status for unit creation
     void resetTurn();

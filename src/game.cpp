@@ -28,10 +28,18 @@ void Game::init() {
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
 
-    Game::round = 0;
+    Game::round = -1;
     
     Player* player1 = Player::makePlayer();
     Player* player2 = Player::makePlayer();
+
+
+    //std::cout << player2->getUUID();
+/*
+    for( auto itr : Player::getPlayers()){
+        std::cout << itr.first << " " << itr.second->getUUID() << std::endl;
+    }
+*/
 
     // Create map
 
@@ -48,7 +56,7 @@ void Game::init() {
 
     // Create one unit on each generated city.
     for( auto const itr : City::getCities()){
-        City::createUnit(itr.second->getUUID(), 10, 1);
+        City::createUnit(itr.second->getUUID(), 10, 1, itr.second->getOwner());
         itr.second->unitCreatedThisTurn = false;
     }
 
@@ -58,6 +66,7 @@ void Game::init() {
 void Game::handleEvents() {
     SDL_Event event;
     SDL_PollEvent(&event);
+    Game::checkVictoryCondition();
 
     if (event.type == SDL_QUIT) {
         running = false;
@@ -67,10 +76,21 @@ void Game::handleEvents() {
 void Game::update() {
 
     Game::round++;
+    currentPlayer = Player::getPlayers().find(round%2)->second;
     std::string command = "";
     bool move_status = false; // used to check if a game command worked.
+    for (auto itr : City::getCities()){
+        itr.second->unitCreatedThisTurn = false;
+    }
+    for (auto itr : Unit::getUnits()){
+        itr.second->moved = false;
+    }
 
-    printf("Round %d begins...\n", Game::round);
+    printf("Round %d begins...\n", Game::round+1);
+    std::cout << "It is player " << currentPlayer->getUUID() << "'s turn." << std::endl;
+    //std::cout << "It is player " << 
+    //std::cout << "It is player "
+    
 
     while(command != "done"){
         printf("Enter command: ");
@@ -186,14 +206,14 @@ bool Game::validate_move(std::vector<std::string> command){
             std::cout << "Error: Missing arguments.\n";
             return false;
         }
-        return Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map);
+        return Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map, currentPlayer);
         break;
     case GameCommands::attack:
         if (command.size() < 3){
             std::cout << "Error: Missing arguments.\n";
             return false;
         }
-        return Unit::attackUnit(std::stoi(command[1]), std::stoi(command[2]));
+        return Unit::attackUnit(std::stoi(command[1]), std::stoi(command[2]), currentPlayer);
         break;
     // TODO: Implement makeunit code
     case GameCommands::makeunit:
@@ -201,7 +221,7 @@ bool Game::validate_move(std::vector<std::string> command){
         std::cout << "Error: Missing arguments.\n";
         return false;
     }
-        return City::createUnit(std::stoi(command[1]), 10, 10);
+        return City::createUnit(std::stoi(command[1]), 10, 10, currentPlayer);
         break;
     case GameCommands::unknown:
         std::cout << "Unknown command, enter \"help\" for list of commands.\n";

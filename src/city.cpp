@@ -19,16 +19,23 @@ bool City::canCreateUnit() const {
 }
 
 // Creates a unit if allowed
-bool City::createUnit(int cityUUID, int health, int attack) {
+bool City::createUnit(int cityUUID, int health, int attack, Player* currentPlayer) {
     
     auto search = cities.find(cityUUID);
 
     if (search == cities.end()) {
-        std::cout << "Invalid action: Unit " << cityUUID << " does not exist." << std::endl;
+        std::cout << "Invalid action: City " << cityUUID << " does not exist." << std::endl;
         return false;
     }
+
+    
     
     City *city = search->second;
+
+    if (city->getOwner() != currentPlayer){
+        std::cout << "Error: City " << cityUUID << " is not your city!" << std::endl;
+        return false;
+    }
     
     if (!city->unitCreatedThisTurn) {
         city->unitCreatedThisTurn = true;

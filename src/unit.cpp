@@ -38,7 +38,7 @@ void Unit::render(SDL_Renderer* renderer) {
     }
 }
 
-bool Unit::move(int movingUUID, int targetTileId, Map& map) {
+bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlayer) {
     
     auto search = units.find(movingUUID);
 
@@ -49,11 +49,16 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map) {
     
     Unit *unit = search->second;
 
+    if (unit->getOwner() != currentPlayer){
+        std::cout << "Error: Unit " << movingUUID << " is not your unit!" << std::endl;
+        return false;
+    }
+
     // Check if the unit has already moved this turn
-    /*if (unit->hasMoved()) {
+    if (unit->hasMoved()) {
         std::cout << "Invalid action: Unit " << unit->getUUID() << " has already moved this turn." << std::endl;
         return false;
-    }*/
+    }
 
     // Check if the unit is trying to move to its current tile
     if (unit->tile->uuid == targetTileId) {
@@ -101,13 +106,21 @@ void Unit::attack(Unit& target) {
     target.health -= damage;
 }
 
-bool Unit::attackUnit(int attackerUUID, int targetUUID)
+bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
 {
+
     // Makes sure attackerUUID exists
     if (Unit::getUnits().find(attackerUUID) == Unit::getUnits().end()) {
         std::cout << "Error: Attacker unit UUID " << attackerUUID << " does not exist!" << std::endl;
         return false;
     }
+
+    if (Unit::getUnits().find(attackerUUID)->second->getOwner() != currentPlayer){
+        std::cout << "Error: Attacker unit UUID " << attackerUUID << " is not your unit!" << std::endl;
+        return false;
+    }
+
+    
 
     // Making sure the target exists, same as above
     if (Unit::getUnits().find(targetUUID) == Unit::getUnits().end()) {
@@ -121,17 +134,22 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID)
         else {
             Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
             City *target = cities.find(targetUUID)->second;
+
+            if (attacker->getTileUUID() != target->getTileUUID()){
+                std::cout << "Error: Target city " << targetUUID << " is not on the same tile as the attacking unit!" << std::endl;
+                return false;
+            }
+            
             if(target->getOwner() == attacker->getOwner()){
                 std::cout << "Error: Cannot capture city on the same team!" << std::endl;
                 return false;
-            }
-            else{
-            Player* oldOwner = target->getOwner();
-            oldOwner->removeCity(target);
-            target->setOwner(attacker->getOwner());
-            attacker->getOwner()->addCity(target);
-            std::cout << "City " << target->getUUID() << " captured!\n";
-            return true;
+            } else{
+                Player* oldOwner = target->getOwner();
+                oldOwner->removeCity(target);
+                target->setOwner(attacker->getOwner());
+                attacker->getOwner()->addCity(target);
+                std::cout << "City " << target->getUUID() << " captured!\n";
+                return true;
             }
         }
         
@@ -140,6 +158,11 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID)
     // Gets reference to attacker and target from map
     Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
     Unit *target = Unit::getUnits().find(targetUUID)->second;
+
+    if (attacker->getTileUUID() != target->getTileUUID()){
+        std::cout << "Error: Target unit " << targetUUID << " is not on the same tile as the attacking unit!" << std::endl;
+        return false;
+    }
 
     if (attacker->getOwner() == target->getOwner()){
         std::cout << "Error: Cannot attack units on the same team!" << std::endl;

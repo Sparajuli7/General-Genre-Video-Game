@@ -5,7 +5,8 @@
 class Uuid {
 public:
     Uuid() : value(counter++) {};
-    Uuid(uint32_t team) : value(team << 32 + Uuid::counter++) {};
+    Uuid(int uuid) : value(uuid) {};
+    //Uuid(uint32_t team) : value(team << 32 + Uuid::counter++) {};
     const uint64_t value;
     operator int() const { return value; }
 

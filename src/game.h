@@ -72,6 +72,7 @@ private:
     lua_State* L;
 
     int round;
+    Player* currentPlayer;
     int numPlayers;
     std::vector<Player> players;
 

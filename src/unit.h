@@ -20,13 +20,14 @@ class Unit {
 public:
     static void renderAll(SDL_Renderer* renderer);
     void render(SDL_Renderer* renderer);
-    static bool move(int movingUUID, int targetTileId, Map& map);
-    static bool attackUnit(int attackerUUID, int targetUUID);
+    static bool move(int movingUUID, int targetTileId, Map& map, Player* currentPlayer);
+    static bool attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer);
     
     int getHealth() const;
     int getAttack() const;
     bool isAlive() const;
     bool hasMoved() const { return moved; }
+    bool moved;
     void resetTurn(); // To reset hasMoved at the end of a turn
 
 
@@ -44,7 +45,7 @@ private:
     MapTile* tile;
     int health;
     int damage;
-    bool moved;
+    
     const Uuid uuid;
     Player *owner;
 
