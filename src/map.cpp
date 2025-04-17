@@ -4,6 +4,7 @@
 #include <iostream>
 #include "map.h"
 
+
 MapTile::MapTile(int uuid, SDL_Color color, SDL_FPoint pos) : uuid(uuid), color(color), pos(pos) {
     return;
 }
@@ -13,6 +14,14 @@ float MapTile::getX(){
 }
 float MapTile::getY(){
     return pos.y;
+}
+
+bool Map::randomCheck(int chance){
+    int pickedChoice = (int)(rand() * 100);
+    if(pickedChoice <= chance){
+        return true;
+    } else return false;
+
 }
 
 Map::Map(int width, int height, float connectedness) {
@@ -43,26 +52,26 @@ Map::Map(int width, int height, float connectedness) {
             bool isOddRow = (y % 2 == 1);
             if (y % 2 == 0) { // Even rows
                 if (y > 0) {
-                    if (x < width - 1) tile->neighbors[0] = grid[x + 1][y - 1]; // NE
+                    if ((x < width - 1)) tile->neighbors[0] = grid[x + 1][y - 1]; // NE
                     tile->neighbors[5] = grid[x][y - 1]; // NW
                 }
-                if (x < width - 1) tile->neighbors[1] = grid[x + 1][y]; // E
-                if (y < height - 1) {
-                    if (x < width - 1) tile->neighbors[2] = grid[x + 1][y + 1]; // SE
+                if ((x < width - 1)) tile->neighbors[1] = grid[x + 1][y]; // E
+                if ((y < height - 1)) {
+                    if ((x < width - 1)) tile->neighbors[2] = grid[x + 1][y + 1]; // SE
                     tile->neighbors[3] = grid[x][y + 1]; // SW
                 }
-                if (x > 0) tile->neighbors[4] = grid[x - 1][y]; // W
+                if ((x > 0)) tile->neighbors[4] = grid[x - 1][y]; // W
             } else { // Odd rows
-                if (y > 0) {
+                if ((y > 0)) {
                     tile->neighbors[0] = grid[x][y - 1]; // NE
-                    if (x > 0) tile->neighbors[5] = grid[x - 1][y - 1]; // NW
+                    if ((x > 0)) tile->neighbors[5] = grid[x - 1][y - 1]; // NW
                 }
-                if (x < width - 1) tile->neighbors[1] = grid[x + 1][y]; // E
-                if (y < height - 1) {
+                if ((x < width - 1)) tile->neighbors[1] = grid[x + 1][y]; // E
+                if ((y < height - 1)) {
                     tile->neighbors[2] = grid[x][y + 1]; // SE
-                    if (x > 0) tile->neighbors[3] = grid[x - 1][y + 1]; // SW
+                    if ((x > 0)) tile->neighbors[3] = grid[x - 1][y + 1]; // SW
                 }
-                if (x > 0) tile->neighbors[4] = grid[x - 1][y]; // W
+                if ((x > 0)) tile->neighbors[4] = grid[x - 1][y]; // W
             }
         }
     }
@@ -126,39 +135,69 @@ void MapTile::renderText(SDL_Renderer* renderer, TTF_Font* font, const std::stri
     }
 
 void Map::render(SDL_Renderer* renderer, TTF_Font* font) {
-    this->spanningTree->render(renderer, {-1.0f, -1.0f}, 30.0f, 0, font);
+    for(auto itr : tilePTR){
+        itr.second->render(renderer, {-1.0f, -1.0f}, 30.0f, font, 1);
+    }
+    for(auto itr : tilePTR){
+        itr.second->render(renderer, {-1.0f, -1.0f}, 30.0f, font, 0);
+    }
+    /*
+    std::unordered_set<int> visitedLines;
+    this->spanningTree->render(renderer, {-1.0f, -1.0f}, 30.0f, 0, font, &visitedLines, 0);
+    std::unordered_set<int> visitedHexes;
+    this->spanningTree->render(renderer, {-1.0f, -1.0f}, 30.0f, 0, font, &visitedHexes, 1);
+    */
 }
 
-//
-void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth, TTF_Font* font) {
+/*
+void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth, TTF_Font* font, std::unordered_set<int>* visited, int mode) {
     // TODO: Creating the hexagon each iteration shouldn't be necessary
     // Create array of hexagonally distributed vertices
-    const int numVertices = 6;
-    SDL_Vertex vertices[numVertices];
-    for (int i = 0; i < numVertices; i++) {
-        vertices[i] = { .position = { .x = scale * (this->pos.x - pos.x + cos(i * M_PI / 3)), 
-                                      .y = scale * (this->pos.y - pos.y + sin(i * M_PI / 3)) },
-                        .color = this->color };
+
+    if (visited->find(this->uuid) != visited->end()) {
+        return;
     }
     
-    
+    // Mark this tile as visited
+    visited->insert(this->uuid);
 
-    // Create four triangles which cover the surface of the hexagon
-    const int numTriangles = 4;
-    const int numIndices = numTriangles * 3;
-    int indices[numIndices];
-    for (int i = 0; i < numTriangles; i++) {
-        indices[i * 3 + 0] = 0;
-        indices[i * 3 + 1] = i + 1;
-        indices[i * 3 + 2] = i + 2;
+    if (mode == 1){
+        const int numVertices = 6;
+        SDL_Vertex vertices[numVertices];
+        for (int i = 0; i < numVertices; i++) {
+            vertices[i] = { .position = { .x = scale * (this->pos.x - pos.x + cos(i * M_PI / 3)), 
+                                        .y = scale * (this->pos.y - pos.y + sin(i * M_PI / 3)) },
+                            .color = this->color };
+        }
+        
+        
+
+        // Create four triangles which cover the surface of the hexagon
+        const int numTriangles = 4;
+        const int numIndices = numTriangles * 3;
+        /*int indices[numIndices];
+        for (int i = 0; i < numTriangles; i++) {
+            indices[i * 3 + 0] = 0;
+            indices[i * 3 + 1] = i + 1;
+            indices[i * 3 + 2] = i + 2;
+        }
+
+        
+        int indices[12] = {
+            0, 1, 2,
+            0, 2, 3,
+            0, 3, 4,
+            0, 4, 5
+        };
+        // Render hexagon to the screen
+        
+        
+        std::string text = std::to_string(this->uuid);
+
+        renderText(renderer, font, text, {255,64,255} , vertices[0].position.x-2, vertices[0].position.y+10);
+
+        SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
     }
-
-    // Render hexagon to the screen
-    
-    
-    std::string text = std::to_string(this->uuid);
-
-    renderText(renderer, font, text, {255,255,255} , vertices[0].position.x-2, vertices[0].position.y+10);
 
     // Recursively render children
     for (MapTile* child : this->children) {
@@ -167,5 +206,65 @@ void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int de
         
         child->render(renderer, pos, scale, depth + 1, font);
     }
-    SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
+
+    for (MapTile* neighbor : this->neighbors) {
+        if (neighbor == nullptr) continue;;
+        if (mode == 0){
+            SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+            SDL_RenderDrawLine(renderer, scale * (this->pos.x - pos.x), scale * (this->pos.y - pos.y), scale * (neighbor->pos.x - pos.x), scale * (neighbor->pos.y - pos.y));
+        }
+        //std::cout << neighbor->uuid << std::endl;
+        neighbor->render(renderer, pos, scale, depth + 1, font, visited, mode);
+    }
+}
+*/
+
+
+void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, TTF_Font* font, int mode) {
+    
+    if (mode == 1){
+        for (MapTile* neighbor : this->neighbors) {
+            if (neighbor == nullptr) continue;
+            SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, SDL_ALPHA_OPAQUE);
+            SDL_RenderDrawLine(renderer, scale * (this->pos.x - pos.x), scale * (this->pos.y - pos.y), scale * (neighbor->pos.x - pos.x), scale * (neighbor->pos.y - pos.y));
+        }
+    }
+    else{
+        const int numVertices = 6;
+        SDL_Vertex vertices[numVertices];
+        for (int i = 0; i < numVertices; i++) {
+            vertices[i] = { .position = { .x = scale * (this->pos.x - pos.x + cos(i * M_PI / 3)), 
+                            .y = scale * (this->pos.y - pos.y + sin(i * M_PI / 3)) },
+                            .color = this->color };
+        }
+
+        const int numTriangles = 4;
+        const int numIndices = numTriangles * 3;
+            /*int indices[numIndices];
+            for (int i = 0; i < numTriangles; i++) {
+                indices[i * 3 + 0] = 0;
+                indices[i * 3 + 1] = i + 1;
+                indices[i * 3 + 2] = i + 2;
+            }*/
+
+            
+        int indices[12] = {
+            0, 1, 2,
+            0, 2, 3,
+            0, 3, 4,
+            0, 4, 5
+        };
+        // Render hexagon to the screen
+        
+        
+        std::string text = std::to_string(this->uuid);
+
+        renderText(renderer, font, text, {255,64,255} , vertices[0].position.x-2, vertices[0].position.y+10);
+
+        SDL_RenderGeometry(renderer, nullptr, vertices, numVertices, indices, numIndices);
+
+    }
+    
+                    
+
 }

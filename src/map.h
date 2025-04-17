@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <unordered_set>
+#include <random>
 
 class MapTile {
 public:
@@ -18,7 +20,7 @@ public:
     float getX();
     float getY();
 
-    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth = 0, TTF_Font* font = NULL);
+    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, TTF_Font* font, int mode);
     // Contains all connections
     std::vector<MapTile*> neighbors;
     // Spanning tree children
@@ -45,6 +47,7 @@ public:
 
 private:
     MapTile* spanningTree;
+    bool randomCheck(int chance = 25);
     
 };
 

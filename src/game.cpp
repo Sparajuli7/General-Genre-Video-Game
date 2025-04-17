@@ -74,7 +74,9 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-
+    if (Game::running == 0){
+        return;
+    }
     Game::round++;
     currentPlayer = Player::getPlayers().find(round%2)->second;
     std::string command = "";
@@ -150,16 +152,17 @@ void Game::update() {
         
     }
 
-    printf("Now performing actions...\n");
+    if( Game::running == true){
+        printf("Now performing actions...\n");
 
-    // TODO: Immplement queue to actually play back commands.
-    while(!Game::actions.empty()){
-        std::cout << "Runnning: " << Game::actions.back() << std::endl;
-        Game::actions.pop_back();
+        // TODO: Immplement queue to actually play back commands.
+        while(!Game::actions.empty()){
+            std::cout << "Runnning: " << Game::actions.back() << std::endl;
+            Game::actions.pop_back();
+        }
+
+        printf("Round %d is now complete.\n\n", Game::round);
     }
-
-    printf("Round %d is now complete.\n\n", Game::round);
-
 }
 
 // Enum converter
