@@ -32,7 +32,7 @@ public:
 
 
     int getUUID() const { return uuid; } // Getter for id
-    int getTileUUID() const { return tile->uuid; }
+    int getTileUUID() const { return tile->getUUID(); }
     MapTile* getTile() const { return tile; } // Getter for current tile
 
     static Unit* makeUnit(int health, int attackRatio, MapTile* tile, Player* owner);

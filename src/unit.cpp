@@ -61,7 +61,7 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     }
 
     // Check if the unit is trying to move to its current tile
-    if (unit->tile->uuid == targetTileId) {
+    if (unit->tile->getUUID() == targetTileId) {
         std::cout << "Unit " << unit->getUUID() << " is already on tile " << targetTileId << "." << std::endl;
         return false;
     }
@@ -76,14 +76,14 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     // Check if the target tile is a neighbor
     bool isNeighbor = false;
     for (MapTile* neighbor : unit->tile->neighbors) {
-        if (neighbor && neighbor->uuid == targetTileId) {
+        if (neighbor && neighbor->getUUID() == targetTileId) {
             isNeighbor = true;
             break;
         }
     }
 
     if (!isNeighbor) {
-        std::cout << "Invalid action: Tile " << targetTileId << " is not adjacent to unit's current tile " << unit->tile->uuid << "." << std::endl;
+        std::cout << "Invalid action: Tile " << targetTileId << " is not adjacent to unit's current tile " << unit->tile->getUUID() << "." << std::endl;
         return false;
     }
 

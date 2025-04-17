@@ -2,7 +2,6 @@
 #define MAP_H
 
 #include <SDL2/SDL.h>
-#include "SDL2/SDL_image.h"
 #include "SDL2/SDL_ttf.h"
 #include <vector>
 #include <map>
@@ -14,41 +13,37 @@ class MapTile {
 public:
     MapTile(int uuid, SDL_Color color, SDL_FPoint pos);
     
-    // Testing
+    const int getUUID() { return uuid; } ;
+    const float getX() { return pos.x; } ;
+    const float getY() { return pos.y; } ;
+
     void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
-
-    float getX();
-    float getY();
-
     void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, TTF_Font* font, int mode);
-    // Contains all connections
+
+    // Contains all connections.
     std::vector<MapTile*> neighbors;
-    // Spanning tree children
-    std::vector<MapTile*> children;
-    int uuid;
-
-    SDL_Texture *texture, *text;
-    TTF_Font* font;
-
-
+    
 private:
+    int uuid;
     SDL_FPoint pos;
-    SDL_Color color;
+    SDL_Color color;   
 };
 
 class Map {
 public:
     Map(int width, int height, float connectedness = 1.0f);
-    //MapTile *findNode(int uuid, MapTile node);
+
+    const int size() { return tilePTR.size(); };
+
     MapTile *findNode(int uuid);
-    int size();
+    
     void render(SDL_Renderer* renderer, TTF_Font* font);
+    
+    // Contains all MapTiles and their UUID.
     std::map<int, MapTile*> tilePTR;
 
 private:
-    MapTile* spanningTree;
     bool randomCheck(int chance = 25);
-    
 };
 
 #endif

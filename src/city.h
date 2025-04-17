@@ -17,7 +17,7 @@ public:
 
     // Get the ID of the city
     int getUUID() const { return uuid; } // Getter for id
-    int getTileUUID() const { return tile->uuid; }
+    int getTileUUID() const { return tile->getUUID(); }
 
     // Check if the city can create a unit this turn
     bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
