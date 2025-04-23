@@ -30,8 +30,8 @@ public:
     void resetTurn();
 
     static City* makeCity(MapTile* tile, Player* owner);
-  
     static const std::map<int, City*> &getCities() { return cities; };
+    static City* uuidToCity(Uuid uuid) { return cities.at(uuid); };
 
     Player* getOwner() const { return owner; };
     void setOwner(Player* player) { owner = player; };

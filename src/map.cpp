@@ -120,6 +120,11 @@ std::pair<int, std::vector<MapTile*>> MapTile::path(MapTile *a, MapTile *b) {
 
         // Otherwise, search neighbors
         for (const auto &neighbor : current->second->neighbors) {
+            // Map generation is busted, some neighbor values are null
+            if (neighbor == nullptr) {
+                continue;
+            }
+
             // Each vertex has a weight of one
             int tentativeScore = current->first + 1;
 

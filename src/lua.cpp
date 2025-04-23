@@ -1,10 +1,13 @@
 #include <lua.hpp>
 #include <iostream>
+#include "lauxlib.h"
+#include "lua.h"
 #include "lua.hpp"
 #include "map.h"
 #include "unit.h"
 #include "city.h"
 #include "player.h"
+#include "game.h"
 
 namespace lua {
 
@@ -48,16 +51,11 @@ int maptilePath(lua_State* L) {
     MapTile* a = MapTile::uuidToMaptile(a_uuid);
     MapTile* b = MapTile::uuidToMaptile(b_uuid);
 
-    std::cout << a << std::endl;
-    std::cout << b << std::endl;
-
     // Compute distance and path
     auto [distance, path] = MapTile::path(a, b);
 
     // Push distance on to stack and return
     lua_pushinteger(L, distance);
-
-    std::cout << "test" << std::endl;
 
     // Convert path vector to table
     lua_newtable(L);
@@ -86,7 +84,6 @@ int maptileNeighbors(lua_State* L) {
 
     // Retrieve maptile uuid from lua stack
     int maptileId = luaL_checkinteger(L, 1);
-    // TODO: lookup maptile from uuid here
     MapTile* maptile = MapTile::uuidToMaptile(maptileId);
 
     // Create 1-indexed table with a list of neighboring maptile uuids
@@ -119,7 +116,7 @@ int maptileGetUnit(lua_State* L) {
     // Retrieve maptile uuid from stack
     int maptileId = luaL_checkinteger(L, 1);
     // TODO: lookup maptile from uuid here
-    MapTile* maptile = nullptr;
+    MapTile* maptile = MapTile::uuidToMaptile(maptileId);
 
     // TODO: get unit
     int unitId = 0;
@@ -143,10 +140,9 @@ int maptileGetCity(lua_State* L) {
 
     // Retrieve maptile uuid from stack
     int maptileId = luaL_checkinteger(L, 1);
-    // TODO: lookup maptile from uuid here
-    MapTile* maptile = nullptr;
+    MapTile* maptile = MapTile::uuidToMaptile(maptileId);
 
-    // TODO: get unit
+    // TODO: Implement this
     int cityId = 0;
     lua_pushinteger(L, cityId);
 
@@ -168,15 +164,14 @@ int playerGetUnits(lua_State* L) {
 
     // Retrieve player uuid from stack
     int playerId = luaL_checkinteger(L, 1);
-    Player* player = nullptr;
+    Player* player = Player::uuidToPlayer(playerId);
 
     // Push table with a list of neighboring maptile uuids
     lua_newtable(L);
     n = lua_gettop(L);
     int i = 1;
     for (auto &unit: player->getUnits()) {
-        int unitId = 0;
-        lua_pushinteger(L, unitId);
+        lua_pushinteger(L, unit->getUUID());
         lua_rawseti(L, n, i);
         i++;
     }
@@ -190,7 +185,7 @@ int playerGetUnits(lua_State* L) {
  * Returns:
  *      table: list of city UUIDs owned by player
  */
-int playerGetCities(lua_State* L) {
+ int playerGetCities(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 1) {
@@ -199,18 +194,65 @@ int playerGetCities(lua_State* L) {
 
     // Retrieve player uuid from stack
     int playerId = luaL_checkinteger(L, 1);
-    Player* player = nullptr;
+    Player* player = Player::uuidToPlayer(playerId);
 
     // Push table with a list of city uuids owned by player
     lua_newtable(L);
     n = lua_gettop(L);
     int i = 1;
     for (auto const &city: player->getCities()) {
-        int cityId = 0;
-        lua_pushinteger(L, cityId);
+        lua_pushinteger(L, city->getUUID());
         lua_rawseti(L, n, i);
         i++;
     }
+
+    return 1;
+}
+
+/* Get UUID of the maptile a unit currently resides on
+ * Takes:
+ *      int: UUID of unit
+ * Returns:
+ *      int: UUID of unit's current maptile
+ */
+ int unitGetMaptile(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Retrieve player uuid from stack
+    int unitId = luaL_checkinteger(L, 1);
+    Unit* unit = Unit::uuidToUnit(unitId);
+
+    // Push maptile uuid
+    int maptileId = unit->getTileUUID();
+    lua_pushinteger(L, maptileId);
+
+    return 1;
+}
+
+/* Get UUID of the maptile a city currently resides on
+ * Takes:
+ *      int: UUID of city
+ * Returns:
+ *      int: UUID of city's current maptile
+ */
+ int cityGetMaptile(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Retrieve player uuid from stack
+    int cityId = luaL_checkinteger(L, 1);
+    City* city = City::uuidToCity(cityId);
+
+    // Push maptile uuid
+    int maptileId = city->getTileUUID();
+    lua_pushinteger(L, maptileId);
 
     return 1;
 }
@@ -306,6 +348,22 @@ int makeMove(lua_State* L) {
         luaL_error(L, "Incorrect number of arguments");
     }
 
+    // Grab id from first index of table
+    lua_pushinteger(L, 1);
+    lua_gettable(L, 1);
+    int id = luaL_checkinteger(L, -1);
+
+    // Do the same with possible arguments, really it would be better to have this be variadic...
+    lua_pushinteger(L, 2);
+    lua_gettable(L, 1);
+    int arg1 = luaL_checkinteger(L, -1);
+    lua_pushinteger(L, 3);
+    lua_gettable(L, 1);
+    int arg2 = luaL_checkinteger(L, -1);
+
+    //
+    Game::validate_move({static_cast<GameCommandId>(id), arg1, arg2});
+
     return 1;
 }
 
@@ -332,6 +390,8 @@ static const struct luaL_Reg funcs[] = {
     {"maptileGetCity", maptileGetCity},
     {"playerGetUnits", playerGetUnits},
     {"playerGetCities", playerGetCities},
+    {"unitGetMaptile", unitGetMaptile},
+    {"cityGetMaptile", cityGetMaptile},
     {"getPlayers", getPlayers},
     {"getCities", getCities},
     {"getUnits", getUnits},
@@ -350,6 +410,7 @@ void loadStrategyLibrary(lua_State* L) {
 
 // Calls a lua function called `think' with the provided player uuid
 void runAI(lua_State* L, int uuid) {
+    std::cout << "AI is thinking..." << std::endl;
     lua_getglobal(L, "think");
     lua_pushinteger(L, uuid);
     lua_call(L, 1, 0);

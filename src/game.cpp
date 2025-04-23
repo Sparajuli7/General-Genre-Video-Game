@@ -183,14 +183,14 @@ bool Game::validate_move(GameCommand command){
     {
     // TODO: Will be implemented soon.
     case GameCommandId::Move:
-        return Unit::move(command.move.unit, command.move.mapTile, *map, currentPlayer);
+        return Unit::move(command.move.unit, command.move.mapTile, *(singleton->map), singleton->currentPlayer);
         break;
     case GameCommandId::Attack:
-        return Unit::attackUnit(command.attack.unit, command.attack.target, currentPlayer);
+        return Unit::attackUnit(command.attack.unit, command.attack.target, singleton->currentPlayer);
         break;
     // TODO: Implement makeunit code
     case GameCommandId::Makeunit:
-        return City::createUnit(command.makeUnit.city, 10, 10, currentPlayer);
+        return City::createUnit(command.makeUnit.city, 10, 10, singleton->currentPlayer);
         break;
     case GameCommandId::Unknown:
         std::cout << "Unknown command, enter \"help\" for list of commands.\n";

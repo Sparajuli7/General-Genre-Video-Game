@@ -49,6 +49,7 @@ public:
 
     static Player* makePlayer();
     static const std::map<Uuid, Player*> &getPlayers() { return players; };
+    static Player* uuidToPlayer(Uuid uuid) { return players.at(uuid); };
 
     const Uuid getUUID() { return uuid; };
 

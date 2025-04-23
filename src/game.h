@@ -28,7 +28,7 @@ public:
     void clean();
     static void requestInput();
 
-    bool validate_move(GameCommand command);
+    static bool validate_move(GameCommand command);
     bool isRunning() { return running; }
 
 private:

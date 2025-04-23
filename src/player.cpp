@@ -18,6 +18,8 @@ Player::Player() : uuid(Uuid()) {}
 std::deque<GameCommand> Player::takeAction() {
     std::deque<GameCommand> actions;
     if (this->isBot) {
+        // This is also very weird
+        L = lua::getInitialEnviron("lua/ai.lua");
         lua::runAI(this->L, this->uuid);
     } else {
         Game::requestInput();

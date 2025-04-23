@@ -37,6 +37,7 @@ public:
 
     static Unit* makeUnit(int health, int attackRatio, MapTile* tile, Player* owner);
     static std::map<int, Unit*>& getUnits() { return units; };
+    static Unit* uuidToUnit(Uuid uuid) { return units.at(uuid); };
 
     Player* getOwner() const { return owner; };
     void setOwner(Player* player) { owner = player; };
