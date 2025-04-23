@@ -4,21 +4,18 @@
 #include <iostream>
 #include "map.h"
 
-MapTile::MapTile(int uuid, SDL_Color color, SDL_FPoint pos) : uuid(uuid), color(color), pos(pos) {
-    return;
+// Effective public constructor
+MapTile* MapTile::makeMapTile(SDL_Color color, SDL_FPoint pos) {
+    MapTile* mapTile = new MapTile(color, pos);
+    mapTiles.insert({mapTile->uuid, mapTile});
+    return mapTile;
 }
 
-float MapTile::getX(){
-    return pos.x;
-}
-float MapTile::getY(){
-    return pos.y;
-}
+MapTile::MapTile(SDL_Color color, SDL_FPoint pos) : uuid(Uuid()), color(color), pos(pos) { }
 
 Map::Map(int width, int height, float connectedness) {
     // Generate a grid of MapTiles
     std::vector<std::vector<MapTile*>> grid;
-    int uuidCounter = 0;
     for (int x = 0; x < width; x++) {
         std::vector<MapTile*> gridRow;
         for (int y = 0; y < height; y++) {
@@ -26,8 +23,7 @@ Map::Map(int width, int height, float connectedness) {
             float offset = (y % 2 == 1) ? 1.5f : 0.0f;
             SDL_FPoint pos = { .x = (float)x * 3.0f + offset, .y = (float)y * 2.598f }; // 2.598 = sqrt(3) * 1.5 for hex spacing
             SDL_Color color = { 0x00, 0x00, 0xff, 0xff };
-            MapTile* node = new MapTile(uuidCounter++, color, pos);
-            tilePTR.insert({node->uuid, node});
+            MapTile* node = MapTile::makeMapTile(color, pos);
             gridRow.push_back(node);
         }
         grid.push_back(gridRow);
@@ -88,14 +84,71 @@ Map::Map(int width, int height, float connectedness) {
         }
     }
 }
-// Returns a map tile using its UUID.
-MapTile* Map::findNode(int uuid){
-    auto search = tilePTR.find(uuid);
-    return search->second;
-}
 
-int Map::size(){
-    return tilePTR.size();
+// Compute path and distance between two map tiles
+// Uses A* algorithm with zero heuristic
+std::pair<int, std::vector<MapTile*>> MapTile::path(MapTile *a, MapTile *b) {
+    // Map of nodes to check, keyed by their current best path length
+    std::multimap<int, MapTile*> openSet = {{0, a}};
+    // Map of best path lengths, keyed by node
+    std::map<MapTile*, int> scores;
+    // Map of previous node in best path, keyed by node
+    std::map<MapTile*, MapTile*> prev;
+
+    // Return early if start and end are identical
+    if (a == b) {
+        return std::make_pair(0, std::vector<MapTile*>());
+    }
+
+    while (!openSet.empty()) {
+        // Find current best candidate
+        auto current = openSet.begin();
+
+        // If candidate matches target, we're done
+        if (current->second == b) {
+            int length = current->first;
+
+            std::vector<MapTile*> path(length);
+            MapTile* node = current->second;
+            for (int i = length - 1; i >= 0; i--) {
+                path.at(i) = node;
+                node = prev.at(node);
+            }
+
+            return std::make_pair(length, path);
+        }
+
+        // Otherwise, search neighbors
+        for (const auto &neighbor : current->second->neighbors) {
+            // Each vertex has a weight of one
+            int tentativeScore = current->first + 1;
+
+            // If new path is shorter, update scores and prev
+            // Also, short circuit evaluation is important here
+            if (scores.find(neighbor) == scores.end() || tentativeScore < scores.at(neighbor)) {
+                scores.insert_or_assign(neighbor, tentativeScore);
+                prev.insert_or_assign(neighbor, current->second);
+
+                // Remove node from open set if it exists
+                auto it = openSet.begin();
+                for (auto it = openSet.begin(); it != openSet.end(); it++) {
+                    if (it->second == neighbor) {
+                        openSet.erase(it);
+                        break;
+                    }
+                }
+
+                // Insert node into open set with potentially updated score
+                openSet.insert({tentativeScore, neighbor});
+            }
+        }
+
+        // Finally, remove candidate from queue
+        openSet.erase(current);
+    }
+
+    // No path found
+    return std::make_pair(0, std::vector<MapTile*>());
 }
 
 void MapTile::renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y) {
@@ -123,7 +176,7 @@ void MapTile::renderText(SDL_Renderer* renderer, TTF_Font* font, const std::stri
     // Clean up
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
-    }
+}
 
 void Map::render(SDL_Renderer* renderer, TTF_Font* font) {
     this->spanningTree->render(renderer, {-1.0f, -1.0f}, 30.0f, 0, font);
@@ -136,8 +189,8 @@ void MapTile::render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int de
     const int numVertices = 6;
     SDL_Vertex vertices[numVertices];
     for (int i = 0; i < numVertices; i++) {
-        vertices[i] = { .position = { .x = scale * (this->pos.x - pos.x + cos(i * M_PI / 3)), 
-                                      .y = scale * (this->pos.y - pos.y + sin(i * M_PI / 3)) },
+        vertices[i] = { .position = { .x = scale * (this->pos.x - pos.x + (float) cos(i * M_PI / 3)), 
+                                      .y = scale * (this->pos.y - pos.y + (float) sin(i * M_PI / 3)) },
                         .color = this->color };
     }
     

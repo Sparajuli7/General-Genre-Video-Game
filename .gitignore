@@ -4,3 +4,4 @@ StrategyGame
 cmake_install.cmake
 CMakeCache.txt
 Makefile
+build/

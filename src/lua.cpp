@@ -1,10 +1,10 @@
+#include <lua.hpp>
+#include <iostream>
 #include "lua.hpp"
 #include "map.h"
-#include "player.h"
 #include "unit.h"
 #include "city.h"
-
-#include <iostream>
+#include "player.h"
 
 namespace lua {
 
@@ -25,14 +25,15 @@ lua_State* getInitialEnviron(const char script[]) {
     return L;
 }
 
-/* Compute distance between two maptiles
+/* Compute distance and path between two maptiles
  * Takes:
  *      int: UUID of from maptile
  *      int: UUID of to maptile
  * Returns:
  *      int: minimal distance between two maptiles
+ *      table: list of uuids representing path between maptiles
  */
-int maptileDistance(lua_State* L) {
+int maptilePath(lua_State* L) {
     // Verify number of input params
     int n = lua_gettop(L);
     if (n != 2) {
@@ -40,16 +41,34 @@ int maptileDistance(lua_State* L) {
     }
 
     // Retrieve maptile uuids from lua stack
-    int from_uuid = luaL_checkinteger(L, 1);
-    int to_uuid = luaL_checkinteger(L, 2);
+    int a_uuid = luaL_checkinteger(L, 1);
+    int b_uuid = luaL_checkinteger(L, 2);
 
-    // TODO: insert call to MapTile.distance() here
-    int distance = 0;
+    // Convert uuids to MapTiles
+    MapTile* a = MapTile::uuidToMaptile(a_uuid);
+    MapTile* b = MapTile::uuidToMaptile(b_uuid);
+
+    std::cout << a << std::endl;
+    std::cout << b << std::endl;
+
+    // Compute distance and path
+    auto [distance, path] = MapTile::path(a, b);
 
     // Push distance on to stack and return
     lua_pushinteger(L, distance);
- 
-    return 1;
+
+    std::cout << "test" << std::endl;
+
+    // Convert path vector to table
+    lua_newtable(L);
+    n = lua_gettop(L);
+    for (int i = 0; i < path.size(); i++) {
+        Uuid nodeUuid = path[i]->uuid;
+        lua_pushinteger(L, nodeUuid);
+        lua_rawseti(L, n, i + 1);
+    }
+    
+    return 2;
 }
 
 /* Get table of maptile UUIDs neighboring a particular maptile
@@ -68,15 +87,16 @@ int maptileNeighbors(lua_State* L) {
     // Retrieve maptile uuid from lua stack
     int maptileId = luaL_checkinteger(L, 1);
     // TODO: lookup maptile from uuid here
-    MapTile* maptile = nullptr;
+    MapTile* maptile = MapTile::uuidToMaptile(maptileId);
 
     // Create 1-indexed table with a list of neighboring maptile uuids
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
-    for (auto &neighbor: maptile->neighbors) {
-        int neighborId = 0;
-        lua_pushinteger(L, neighborId);
-        lua_rawseti(L, 1, i);
+    for (auto &neighbor: maptile->getNeighbors()) {
+        Uuid neighborUuid = neighbor->uuid;
+        lua_pushinteger(L, neighborUuid);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -152,11 +172,12 @@ int playerGetUnits(lua_State* L) {
 
     // Push table with a list of neighboring maptile uuids
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
     for (auto &unit: player->getUnits()) {
         int unitId = 0;
         lua_pushinteger(L, unitId);
-        lua_rawseti(L, 1, i);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -182,11 +203,12 @@ int playerGetCities(lua_State* L) {
 
     // Push table with a list of city uuids owned by player
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
     for (auto const &city: player->getCities()) {
         int cityId = 0;
         lua_pushinteger(L, cityId);
-        lua_rawseti(L, 1, i);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -208,10 +230,11 @@ int getPlayers(lua_State* L) {
 
     // Push table with a list of all player uuids
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
     for (auto const &[id, player]: Player::getPlayers()) {
         lua_pushinteger(L, id);
-        lua_rawseti(L, 1, i);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -233,10 +256,11 @@ int getCities(lua_State* L) {
 
     // Push table with a list of all city uuids
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
     for (auto const &[id, city]: City::getCities()) {
         lua_pushinteger(L, id);
-        lua_rawseti(L, 1, i);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -258,10 +282,11 @@ int getUnits(lua_State* L) {
 
     // Push table with a list of all unit uuids
     lua_newtable(L);
+    n = lua_gettop(L);
     int i = 1;
     for (auto const &[id, unit]: Unit::getUnits()) {
         lua_pushinteger(L, id);
-        lua_rawseti(L, 1, i);
+        lua_rawseti(L, n, i);
         i++;
     }
 
@@ -302,7 +327,7 @@ int undoMove(lua_State* L) {
 
 // C++ wrapper functions that will be marked as callable by Lua
 static const struct luaL_Reg funcs[] = {
-    {"maptileDistance", maptileDistance},
+    {"maptilePath", maptilePath},
     {"maptileGetUnit", maptileGetUnit},
     {"maptileGetCity", maptileGetCity},
     {"playerGetUnits", playerGetUnits},

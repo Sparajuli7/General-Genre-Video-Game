@@ -33,7 +33,7 @@ void Unit::render(SDL_Renderer* renderer) {
         // TODO: Change render logic to render based on location of current tile.
         // Currently crashes on the line that uses tiles, need to see why this is happening.
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect unitRect = { tile->getX() * 30 + 10 + (Unit::owner->getUUID()*21), tile->getY() * 30 + 12, 20, 26 };
+        SDL_Rect unitRect = { (int) (tile->getX() * 30) + 10 + (Unit::owner->getUUID()*21), (int) (tile->getY() * 30) + 12, 20, 26 };
         SDL_RenderFillRect(renderer, &unitRect);
     }
 }
@@ -67,7 +67,7 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     }
 
     // Find the destination tile using the map
-    MapTile* targetTile = map.findNode(targetTileId);
+    MapTile* targetTile = MapTile::uuidToMaptile(targetTileId);
     if (!targetTile) {
         std::cout << "Invalid action: Tile with ID " << targetTileId << " does not exist." << std::endl;
         return false;
