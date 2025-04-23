@@ -11,6 +11,8 @@ function think(playerId)
 
     -- Get city locations of opposing player
     opponentCities = strategy.playerGetCities(opponentId)
+    -- Get units owned by opposing player
+    opponentUnits = strategy.playerGetUnits(opponentId)
     -- Get units owned by current player
     units = strategy.playerGetUnits(playerId)
     -- Get cities owned by current player
@@ -21,8 +23,22 @@ function think(playerId)
         currentTile = strategy.unitGetMaptile(unit)
         targetTile = strategy.cityGetMaptile(opponentCities[1])
         distance, path = strategy.maptilePath(currentTile, targetTile)
+
+        for _, enemy in ipairs(opponentUnits) do
+            if (currentTile == strategy.unitGetMaptile(enemy)) then
+                strategy.makeMove({2, unit, enemy})
+            end
+        end
+
         if (path[1] ~= nil) then
             strategy.makeMove({1, unit, path[1]})
+        end
+    end
+
+    -- Each city should attempt to produce a unit
+    for _, city in ipairs(cities) do
+        if (math.random(5) == 1) then
+            strategy.makeMove({3, city, 0})
         end
     end
 
