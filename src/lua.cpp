@@ -367,6 +367,85 @@ int makeMove(lua_State* L) {
     return 1;
 }
 
+/* Moves a unit to the specified tile
+ * Takes:
+ *      int: uuid of unit
+ *      int: uuid of tile to move to
+ * Returns:
+ *      boolean: true if move is possible, false if move was rejected
+ */
+int moveUnit(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 2) {
+        luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Fetch arguments from stack
+    int unitId = luaL_checkinteger(L, 1);
+    int maptileId = luaL_checkinteger(L, 2);
+
+    // Validate move
+    bool success = Game::validate_move({GameCommandId::Move, unitId, maptileId});
+
+    // Return sucess status
+    lua_pushboolean(L, success);
+
+    return 1;
+}
+
+/* Attacks a unit or city with a particular unit
+ * Takes:
+ *      int: uuid of attacking unit
+ *      int: uuid of game object to be attacked
+ * Returns:
+ *      boolean: true if move is possible, false if move was rejected
+ */
+int attackUnit(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 2) {
+        luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Fetch arguments from stack
+    int attackerId = luaL_checkinteger(L, 1);
+    int attackeeId = luaL_checkinteger(L, 2);
+
+    // Validate move
+    bool success = Game::validate_move({GameCommandId::Attack, attackerId, attackeeId});
+
+    // Return sucess status
+    lua_pushboolean(L, success);
+
+    return 1;
+}
+
+/* Creates a unit at a particular city
+ * Takes:
+ *      int: uuid of city
+ * Returns:
+ *      boolean: true if move is possible, false if move was rejected
+ */
+int createUnit(lua_State* L) {
+    // Verify number of input params
+    int n = lua_gettop(L);
+    if (n != 1) {
+        luaL_error(L, "Incorrect number of arguments");
+    }
+
+    // Fetch arguments from stack
+    int cityId = luaL_checkinteger(L, 1);
+
+    // Validate move
+    bool success = Game::validate_move({GameCommandId::Makeunit, cityId});
+
+    // Return sucess status
+    lua_pushboolean(L, success);
+
+    return 1;
+}
+
 /* Undoes the most recent move that was committed to the action queue
  * Takes:
  *      Nothing
@@ -395,8 +474,11 @@ static const struct luaL_Reg funcs[] = {
     {"getPlayers", getPlayers},
     {"getCities", getCities},
     {"getUnits", getUnits},
-    {"makeMove", makeMove},
-    {"undoMove", undoMove},
+//    {"makeMove", makeMove},
+//    {"undoMove", undoMove},
+    {"moveUnit", moveUnit},
+    {"attackUnit", attackUnit},
+    {"createUnit", createUnit},
     {NULL, NULL}
 };
 

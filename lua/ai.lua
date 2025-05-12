@@ -26,20 +26,26 @@ function think(playerId)
 
         for _, enemy in ipairs(opponentUnits) do
             if (currentTile == strategy.unitGetMaptile(enemy)) then
-                strategy.makeMove({2, unit, enemy})
+                strategy.attackUnit(unit, enemy)
+--                strategy.makeMove({2, unit, enemy})
             end
         end
 
         if (path[1] ~= nil) then
-            strategy.makeMove({1, unit, path[1]})
+            strategy.moveUnit(unit, path[1])
+--            strategy.makeMove({1, unit, path[1]})
+        else
+            strategy.attackUnit(unit, opponentCities[1])
+--            strategy.makeMove({2, unit, opponentCities[1]})
         end
     end
 
     -- Each city should attempt to produce a unit
     for _, city in ipairs(cities) do
-        if (math.random(5) == 1) then
-            strategy.makeMove({3, city, 0})
-        end
+--        if (math.random(5) == 1) then
+            strategy.createUnit(city)
+--            strategy.makeMove({3, city, 0})
+--        end
     end
 
     return
