@@ -24,28 +24,26 @@ function think(playerId)
         targetTile = strategy.cityGetMaptile(opponentCities[1])
         distance, path = strategy.maptilePath(currentTile, targetTile)
 
+        -- Attack enemy units if we happen to occupy their tile
         for _, enemy in ipairs(opponentUnits) do
             if (currentTile == strategy.unitGetMaptile(enemy)) then
                 strategy.attackUnit(unit, enemy)
---                strategy.makeMove({2, unit, enemy})
             end
         end
 
+        -- Continue along the path, attacking the target city when we reach it
         if (path[1] ~= nil) then
             strategy.moveUnit(unit, path[1])
---            strategy.makeMove({1, unit, path[1]})
         else
             strategy.attackUnit(unit, opponentCities[1])
---            strategy.makeMove({2, unit, opponentCities[1]})
         end
     end
 
     -- Each city should attempt to produce a unit
     for _, city in ipairs(cities) do
---        if (math.random(5) == 1) then
+        if (math.random(5) == 1) then
             strategy.createUnit(city)
---            strategy.makeMove({3, city, 0})
---        end
+        end
     end
 
     return
