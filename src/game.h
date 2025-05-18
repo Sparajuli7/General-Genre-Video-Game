@@ -26,9 +26,10 @@ public:
     void update();
     void render();
     void clean();
+    static void requestInput();
 
-    bool validate_move(std::vector<std::string> command);
-    bool isRunning() const { return running; }
+    static bool validate_move(GameCommand command);
+    bool isRunning() { return running; }
 
 private:
     // Disable and enable rendering
@@ -49,27 +50,16 @@ private:
         help = 6,
         quit = 7
     };
-    ImmediateCommands convertToImmediate(std::string command);
+    static ImmediateCommands convertToImmediate(std::string command);
 
     void listMap();
     void listUnit();
     void listCity();
 
-    enum GameCommands{
-        unknown = 0,
-        move = 1,
-        attack = 2,
-        makeunit = 3,
-    };
-    GameCommands convertToGame(std::string command);
+    static GameCommand convertToGame(std::string command);
 
     // Some map structures will be moved to their respective class file soon.
     Map* map;
-    std::map<int, City*> cities;
-    //std::map<int, Unit*> units;
-    
-    std::deque<std::string> actions;
-    lua_State* L;
 
     int round;
     Player* currentPlayer;
@@ -79,8 +69,6 @@ private:
     std::string getAIAction(Unit* unit);
 
     void checkVictoryCondition();
-
-
 };
 
 #endif

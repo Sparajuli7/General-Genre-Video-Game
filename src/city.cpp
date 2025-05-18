@@ -71,7 +71,7 @@ void City::render(SDL_Renderer* renderer) {
     // TODO: Change render logic to render based on location of current tile.
     // Currently crashes on the line that uses tiles, need to see why this is happening.
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect cityRect = { tile->getX() * 30 + 15, tile->getY() * 30 + 45, 28, 10 };
+    SDL_Rect cityRect = { (int) (tile->getX() * 30) + 15, (int) (tile->getY() * 30) + 45, 28, 10 };
     SDL_RenderFillRect(renderer, &cityRect);
     
 }

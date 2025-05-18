@@ -1,7 +1,14 @@
 #include "game.h"
 #include "lua.h"
+#include <string>
+// This is hacky as hellllll, just turning it into a pseudo singleton
+// Also I have no idea why this doesn't work as a static class member, so it's going as a static global instead, some sort of link error
+// Whatever.
+static Game* singleton;
 
-Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr), L(nullptr) {}
+Game::Game() : window(nullptr), renderer(nullptr), running(false), map(nullptr) {
+    singleton = this;
+}
 
 Game::~Game() {
     // Currently this crashes the program
@@ -50,9 +57,9 @@ void Game::init() {
     // Create two cities.
     //MapTile *randTile = map->findNode(distr(gen));
 
-    City::makeCity(map->findNode(0), player1);
+    City::makeCity(MapTile::uuidToMaptile(MapTile::getMapTiles().begin()->first), player1);
 
-    City::makeCity(map->findNode(map->size()-22), player2);
+    City::makeCity(MapTile::uuidToMaptile(MapTile::getMapTiles().end()->first), player2);
 
     // Create one unit on each generated city.
     for( auto const itr : City::getCities()){
@@ -77,8 +84,6 @@ void Game::update() {
 
     Game::round++;
     currentPlayer = Player::getPlayers().find(round%2)->second;
-    std::string command = "";
-    bool move_status = false; // used to check if a game command worked.
     for (auto itr : City::getCities()){
         itr.second->unitCreatedThisTurn = false;
     }
@@ -90,72 +95,15 @@ void Game::update() {
     std::cout << "It is player " << currentPlayer->getUUID() << "'s turn." << std::endl;
     //std::cout << "It is player " << 
     //std::cout << "It is player "
-    
+    std::deque<GameCommand> actions = currentPlayer->takeAction();
 
-    while(command != "done"){
-        printf("Enter command: ");
-        
-        getline(std::cin, command);
-        std::string s;
-        std::stringstream ss(command);
-        std::vector<std::string> splitCommand;
-        // Splits Command by spaces
-        while (getline(ss, s, ' ')) {
-            // store token string in the vector
-            splitCommand.push_back(s);
-        }
-
-        switch (convertToImmediate(splitCommand[0])) {
-            case ImmediateCommands::done:
-                break;
-            case ImmediateCommands::undo:
-                std::cout << "Reversing command: " << Game::actions.front() << std::endl;
-                Game::actions.pop_front();
-                break;
-            // TODO: Implement listmap and listunit
-            case ImmediateCommands::listmap: // Returns the map and provides info on what units and cities are in each tile
-                break;
-            case ImmediateCommands::listunit: // Returns the specified player's units
-                listUnit();
-                break;
-            case ImmediateCommands::listcity: // Returns the specified player's cities
-                listCity();
-                break;
-            case ImmediateCommands::help:
-                std::cout << "\nGame Commands:\n"
-                    "done: Completes the turn and applies all actions to game.\n"
-                    "undo: Removes last action from queue.\n"
-                    "help: Prints this command list.\n"
-                    "quit: Will quit the game. Nothing is saved."
-                    "listmap: Returns the map and coordinates of each tile.\n"
-                    "listunit [player number]: Returns the specified player's units\n"
-                    "listcity [player number]: Returns the specified player's cities\n"
-                    "move [unit id xxx] [tile coordinate]: Attempts to move the unit to the specified map tile. Can only move one tile per turn.\n"
-                    "attack [unit id xxx]: Attempts to attack an opposing player's unit if the specified unit is sharing a tile with one.\n"
-                    "makeunit [city id xxx]: Attempts to create a unit on the specified city. Can only be done once per turn.\n\n";
-                break;
-            // Crashes the game but technically does quit the game.
-            case ImmediateCommands::quit:
-                Game::running = false;
-                command = "done";
-                break;
-            // If no immediate commands are found, switch to checking commands to be queued.
-            case ImmediateCommands::none:
-                move_status = Game::validate_move(splitCommand); 
-                if ((move_status == true) && (splitCommand[0] != "done")){
-                    Game::actions.push_front(command);
-                }
-        }
-
-        
-    }
 
     printf("Now performing actions...\n");
 
     // TODO: Immplement queue to actually play back commands.
-    while(!Game::actions.empty()){
-        std::cout << "Runnning: " << Game::actions.back() << std::endl;
-        Game::actions.pop_back();
+    while(!actions.empty()){
+//        std::cout << "Runnning: " << actions.back() << std::endl;
+        actions.pop_back();
     }
 
     printf("Round %d is now complete.\n\n", Game::round);
@@ -188,42 +136,63 @@ void Game::listUnit(){
 }
 
 // Enum converter
-Game::GameCommands Game::convertToGame(std::string command){
-    if (command == "move") return GameCommands::move;
-    if (command == "attack") return GameCommands::attack;
-    if (command == "makeunit") return GameCommands::makeunit;
-    return GameCommands::unknown;
+GameCommand Game::convertToGame(std::string commandString){
+    // Splits Command by spaces
+    std::string s;
+    std::stringstream ss(commandString);
+    std::vector<std::string> splitCommand;
+    while (getline(ss, s, ' ')) {
+        // store token string in the vector
+        splitCommand.push_back(s);
+    }
+
+    GameCommand command;
+    command.id = GameCommandId::Unknown;
+    if (splitCommand[0] == "move") {
+        if (splitCommand.size() != 3){
+            std::cout << "Error: Missing arguments.\n";
+            return command;
+        }
+        command.id = GameCommandId::Move;
+        command.move.unit = std::stoi(splitCommand[1]);
+        command.move.mapTile = std::stoi(splitCommand[2]);
+    } else if (splitCommand[0] == "attack") {
+        if (splitCommand.size() != 3){
+            std::cout << "Error: Missing arguments.\n";
+            return command;
+        }
+        command.id = GameCommandId::Attack;
+        command.attack.unit = std::stoi(splitCommand[1]);
+        command.attack.target = std::stoi(splitCommand[2]);
+    } else if (splitCommand.front() == "makeunit") {
+        if (splitCommand.size() != 2){
+            std::cout << "Error: Missing arguments.\n";
+            return command;
+        }
+        command.id = GameCommandId::Makeunit;
+        command.makeUnit.city = std::stoi(splitCommand[1]);
+    }
+
+    return command;
 }
 
 /* Game actions that are saved to the deque before being run in the main game to support undoing.*/
 // Currently implemented code will automatically run for testing
-bool Game::validate_move(std::vector<std::string> command){
-    switch (convertToGame(command[0]))
+bool Game::validate_move(GameCommand command){
+    switch (command.id)
     {
     // TODO: Will be implemented soon.
-    case GameCommands::move:
-        if (command.size() < 3){
-            std::cout << "Error: Missing arguments.\n";
-            return false;
-        }
-        return Unit::move(std::stoi(command[1]), std::stoi(command[2]), *map, currentPlayer);
+    case GameCommandId::Move:
+        return Unit::move(command.move.unit, command.move.mapTile, *(singleton->map), singleton->currentPlayer);
         break;
-    case GameCommands::attack:
-        if (command.size() < 3){
-            std::cout << "Error: Missing arguments.\n";
-            return false;
-        }
-        return Unit::attackUnit(std::stoi(command[1]), std::stoi(command[2]), currentPlayer);
+    case GameCommandId::Attack:
+        return Unit::attackUnit(command.attack.unit, command.attack.target, singleton->currentPlayer);
         break;
     // TODO: Implement makeunit code
-    case GameCommands::makeunit:
-    if (command.size() < 2){
-        std::cout << "Error: Missing arguments.\n";
-        return false;
-    }
-        return City::createUnit(std::stoi(command[1]), 10, 10, currentPlayer);
+    case GameCommandId::Makeunit:
+        return City::createUnit(command.makeUnit.city, 10, 10, singleton->currentPlayer);
         break;
-    case GameCommands::unknown:
+    case GameCommandId::Unknown:
         std::cout << "Unknown command, enter \"help\" for list of commands.\n";
         return false;
     }
@@ -275,4 +244,64 @@ void Game::clean() {
         SDL_DestroyRenderer(renderer);
     }
     SDL_Quit();
+}
+
+void Game::requestInput() {
+    std::string command = "";
+    bool move_status = false; // used to check if a game command worked.
+    std::deque<std::string> actions;
+
+    while (command != "done") {
+        getline(std::cin, command);
+        std::string s;
+        std::stringstream ss(command);
+        std::vector<std::string> splitCommand;
+        // Splits Command by spaces
+        while (getline(ss, s, ' ')) {
+            // store token string in the vector
+            splitCommand.push_back(s);
+        }
+
+        switch (convertToImmediate(splitCommand[0])) {
+            case ImmediateCommands::done:
+                break;
+            case ImmediateCommands::undo:
+                std::cout << "Reversing command: " << actions.front() << std::endl;
+                actions.pop_front();
+                break;
+            // TODO: Implement listmap and listunit
+            case ImmediateCommands::listmap: // Returns the map and provides info on what units and cities are in each tile
+                break;
+            case ImmediateCommands::listunit: // Returns the specified player's units
+                singleton->listUnit();
+                break;
+            case ImmediateCommands::listcity: // Returns the specified player's cities
+                singleton->listCity();
+                break;
+            case ImmediateCommands::help:
+                std::cout << "\nGame Commands:\n"
+                    "done: Completes the turn and applies all actions to game.\n"
+                    "undo: Removes last action from queue.\n"
+                    "help: Prints this command list.\n"
+                    "quit: Will quit the game. Nothing is saved."
+                    "listmap: Returns the map and coordinates of each tile.\n"
+                    "listunit [player number]: Returns the specified player's units\n"
+                    "listcity [player number]: Returns the specified player's cities\n"
+                    "move [unit id xxx] [tile coordinate]: Attempts to move the unit to the specified map tile. Can only move one tile per turn.\n"
+                    "attack [unit id xxx]: Attempts to attack an opposing player's unit if the specified unit is sharing a tile with one.\n"
+                    "makeunit [city id xxx]: Attempts to create a unit on the specified city. Can only be done once per turn.\n\n";
+                break;
+            // Crashes the game but technically does quit the game.
+            case ImmediateCommands::quit:
+                singleton->running = false;
+                command = "done";
+                break;
+            // If no immediate commands are found, switch to checking commands to be queued.
+            case ImmediateCommands::none:
+                move_status = singleton->validate_move(Game::convertToGame(command)); 
+                if ((move_status == true) && (splitCommand[0] != "done")){
+                    actions.push_front(command);
+                }
+        }
+    }
 }

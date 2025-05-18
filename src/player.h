@@ -4,9 +4,8 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <deque>
 #include "lua.hpp"
-//#include "unit.h"
-//#include "city.h"
 #include "map.h"
 #include "uuid.hpp"
 
@@ -14,16 +13,43 @@ class Unit;
 class City;
 //class MapTile;
 
+// This is hackyyyyy
+enum GameCommandId {
+    Unknown,
+    Move,
+    Attack,
+    Makeunit
+};
+
+struct GameCommand {
+    GameCommandId id;
+    union {
+        struct {
+            int unit;
+            int mapTile;
+        } move;
+
+        struct {
+            int unit;
+            int target;
+        } attack;
+
+        struct {
+            int city;
+        } makeUnit;
+    };
+};
 
 class Player {
 public:
     void render(SDL_Renderer* renderer);
-    void takeAction();
+    std::deque<GameCommand> takeAction();
     std::vector<Unit*> getUnits();
     std::vector<City*> getCities();
 
     static Player* makePlayer();
     static const std::map<Uuid, Player*> &getPlayers() { return players; };
+    static Player* uuidToPlayer(Uuid uuid) { return players.at(uuid); };
 
     const Uuid getUUID() { return uuid; };
 
