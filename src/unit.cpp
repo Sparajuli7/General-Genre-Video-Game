@@ -1,5 +1,3 @@
-
-
 #include "unit.h"
 #include "city.h"
 #include "player.h"
@@ -7,21 +5,18 @@
 
 // Effective public constructor. Inserts created unit into unit map
 Unit* Unit::makeUnit(int health, int attackRatio, MapTile* tile, Player* owner) {
-    // TODO: This feels dirty. I'm pretty sure there's a better way to do this
     Unit *unit = new Unit(health, attackRatio, tile, owner);
     Unit::units.insert({unit->uuid, unit});
     owner->addUnit(unit);
     return Unit::units.at(unit->uuid);
 }
 
-
-// TODO: the units map from game.cpp will be relocated here, this should allow for most code pertaining to manipulating units to reside here.
-
 Unit::Unit(int health, int attackRatio, MapTile* tile, Player* owner) : uuid(Uuid()), health(health), tile(tile), owner(owner) {
     moved = false;
     damage = health * attackRatio;
 }
 
+// Renders every unit in the units map
 void Unit::renderAll(SDL_Renderer* renderer){
     for (auto const itr : units){
         itr.second->render(renderer);
@@ -30,8 +25,7 @@ void Unit::renderAll(SDL_Renderer* renderer){
 
 void Unit::render(SDL_Renderer* renderer) {
     if (health > 0) {
-        // TODO: Change render logic to render based on location of current tile.
-        // Currently crashes on the line that uses tiles, need to see why this is happening.
+        // Having various values here be a modifiable variable would be needed to make the window size changable
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_Rect unitRect = { (int) (tile->getX() * 30) + 10 + (Unit::owner->getUUID()*21), (int) (tile->getY() * 30) + 12, 20, 26 };
         SDL_RenderFillRect(renderer, &unitRect);
@@ -42,6 +36,7 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     
     auto search = units.find(movingUUID);
 
+    // Check if unit with UUID exists
     if (search == units.end()) {
         std::cout << "Invalid action: Unit " << movingUUID << " does not exist." << std::endl;
         return false;
@@ -49,6 +44,7 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     
     Unit *unit = search->second;
 
+    // Check if unit is owned by current player
     if (unit->getOwner() != currentPlayer){
         std::cout << "Error: Unit " << movingUUID << " is not your unit!" << std::endl;
         return false;
@@ -82,11 +78,13 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
         }
     }
 
+    // Check if the unit is adjecent to the target tile
     if (!isNeighbor) {
         std::cout << "Invalid action: Tile " << targetTileId << " is not adjacent to unit's current tile " << unit->tile->uuid << "." << std::endl;
         return false;
     }
 
+    // Check if there the player already has a unit on the target tile
     for (auto itr : unit->owner->getUnits()){
         if (itr->getTileUUID() == targetTileId){
             std::cout << "Invalid action: Tile " << targetTileId << " already has your unit " << itr->getUUID() << "on it." << std::endl;
@@ -101,20 +99,16 @@ bool Unit::move(int movingUUID, int targetTileId, Map& map, Player* currentPlaye
     return true;
 }
 
-
-void Unit::attack(Unit& target) {
-    target.health -= damage;
-}
-
 bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
 {
 
-    // Makes sure attackerUUID exists
+    // Check if attacker unit exists
     if (Unit::getUnits().find(attackerUUID) == Unit::getUnits().end()) {
         std::cout << "Error: Attacker unit UUID " << attackerUUID << " does not exist!" << std::endl;
         return false;
     }
 
+    // Check if attacker unit is owned by the player
     if (Unit::getUnits().find(attackerUUID)->second->getOwner() != currentPlayer){
         std::cout << "Error: Attacker unit UUID " << attackerUUID << " is not your unit!" << std::endl;
         return false;
@@ -125,7 +119,8 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
     // Making sure the target exists, same as above
     if (Unit::getUnits().find(targetUUID) == Unit::getUnits().end()) {
         std::cout << "Error: Target unit UUID " << targetUUID << " does not exist! Trying city capture." << std::endl;
-        // Check if target is city, perform city actions
+        
+        // Check if target is city, perform city actions instead
         std::map<int, City*> cities = City::getCities();
         if (cities.find(targetUUID) == cities.end()){
             std::cout << "Error: Target city UUID " << targetUUID << " does not exist!" << std::endl;
@@ -135,11 +130,13 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
             Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
             City *target = cities.find(targetUUID)->second;
 
+            // Check if city is on the same tile
             if (attacker->getTileUUID() != target->getTileUUID()){
                 std::cout << "Error: Target city " << targetUUID << " is not on the same tile as the attacking unit!" << std::endl;
                 return false;
             }
             
+            // Check if city is owned by the same player
             if(target->getOwner() == attacker->getOwner()){
                 std::cout << "Error: Cannot capture city on the same team!" << std::endl;
                 return false;
@@ -159,11 +156,13 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
     Unit *attacker = Unit::getUnits().find(attackerUUID)->second;
     Unit *target = Unit::getUnits().find(targetUUID)->second;
 
+    // Check if target unit is on the same tile as the attacker unit
     if (attacker->getTileUUID() != target->getTileUUID()){
         std::cout << "Error: Target unit " << targetUUID << " is not on the same tile as the attacking unit!" << std::endl;
         return false;
     }
 
+    // Check if target is also owned the player
     if (attacker->getOwner() == target->getOwner()){
         std::cout << "Error: Cannot attack units on the same team!" << std::endl;
         return false;
@@ -186,17 +185,3 @@ bool Unit::attackUnit(int attackerUUID, int targetUUID, Player* currentPlayer)
     return true;
 }
 
-
-
-
-int Unit::getHealth() const {
-    return health;
-}
-
-int Unit::getAttack() const {
-    return damage;
-}
-
-bool Unit::isAlive() const {
-    return health > 0;
-}

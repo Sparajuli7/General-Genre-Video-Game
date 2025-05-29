@@ -7,18 +7,18 @@
 #include <iostream>
 
 // Effective public constructor. Inserts created player into player map
-Player* Player::makePlayer() {
-    Player* player = new Player();
+Player* Player::makePlayer(bool isBot) {
+    Player* player = new Player(isBot);
     players.insert({player->uuid, player});
     return player;
 }
 
-Player::Player() : uuid(Uuid()) {}
+Player::Player(bool isBot) : uuid(Uuid()), isBot(isBot) {}
+
 
 std::deque<GameCommand> Player::takeAction() {
     std::deque<GameCommand> actions;
     if (this->isBot) {
-        // This is also very weird
         L = lua::getInitialEnviron("lua/ai.lua");
         lua::runAI(this->L, this->uuid);
     } else {
@@ -26,17 +26,4 @@ std::deque<GameCommand> Player::takeAction() {
     }
 
     return actions;
-}
-
-// TODO: Actually make use of the Player class.
-void Player::render(SDL_Renderer* renderer) {
-    return;
-}
-
-std::vector<Unit*> Player::getUnits() {
-    return this->units;
-}
-
-std::vector<City*> Player::getCities() {
-    return this->cities;
 }

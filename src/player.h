@@ -11,7 +11,6 @@
 
 class Unit;
 class City;
-//class MapTile;
 
 // This is hackyyyyy
 enum GameCommandId {
@@ -42,16 +41,14 @@ struct GameCommand {
 
 class Player {
 public:
-    void render(SDL_Renderer* renderer);
+
     std::deque<GameCommand> takeAction();
-    std::vector<Unit*> getUnits();
-    std::vector<City*> getCities();
+    
+    const Uuid getUUID() { return uuid; }; 
 
-    static Player* makePlayer();
-    static const std::map<Uuid, Player*> &getPlayers() { return players; };
-    static Player* uuidToPlayer(Uuid uuid) { return players.at(uuid); };
-
-    const Uuid getUUID() { return uuid; };
+    /* Vectors and functions that handle the player's units and cities */
+    std::vector<Unit*> getUnits() { return this->units; };
+    std::vector<City*> getCities() { return this->cities; };
 
     void addCity(City* city) { cities.push_back(city); }
     void addUnit(Unit* unit) { units.push_back(unit); };
@@ -64,19 +61,29 @@ public:
         Player::units.erase(std::remove(units.begin(), units.end(), unit), units.end());
     }
 
-    bool isDefeated() const { return cities.empty(); }
-
+    // Player is considered to be defeated if they have no more cities
+    bool isDefeated() const { return cities.empty(); } 
+    
+    /* Static functions that make use of the players map */
+    static Player* makePlayer(bool isBot);
+    static const std::map<Uuid, Player*> &getPlayers() { return players; };
+    static Player* uuidToPlayer(Uuid uuid) { return players.at(uuid); };
 
 
 private:
-    Player();
+    Player(bool isBot); // makePlayer is intended to be the public initializer
+    
+    // AI stuff
     lua_State* L;
-    bool isBot;
-    MapTile* cursor;
+    bool isBot; 
+    
     std::vector<Unit*> units;
     std::vector<City*> cities;
     const Uuid uuid;
 
+    //MapTile* cursor; // Should be used for UI implementation 
+
+    // Map function that contains a player pointer and its UUID
     static inline std::map<Uuid, Player*> players = std::map<Uuid, Player*>();
 };
 

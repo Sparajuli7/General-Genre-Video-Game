@@ -35,11 +35,13 @@ private:
     // Disable and enable rendering
     bool renderOn = true;
 
+    /* SDL rendering things */
     SDL_Window* window;
     SDL_Renderer* renderer;
     TTF_Font* font;
     bool running;
 
+    // Enum to represent commands that can be run by a human player.
     enum ImmediateCommands{
         none = 0,
         done = 1,
@@ -52,15 +54,15 @@ private:
     };
     static ImmediateCommands convertToImmediate(std::string command);
 
-    void listMap();
+    /* Commands that list game information to human player */
+    void listMap(); // Unused, could be used to provide a player without GUI map connections
     void listUnit();
     void listCity();
 
     static GameCommand convertToGame(std::string command);
 
-    // Some map structures will be moved to their respective class file soon.
+    /* Variables for current game */
     Map* map;
-
     int round;
     Player* currentPlayer;
     int numPlayers;

@@ -17,20 +17,18 @@ public:
     static std::pair<int, std::vector<MapTile*>> path(MapTile *a, MapTile *b);
     static MapTile* uuidToMaptile(Uuid uuid) { return mapTiles.at(uuid); };
     static const std::map<Uuid, MapTile*>& getMapTiles() { return mapTiles; };
-    
-    // Testing
-    void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
 
+    const int getUUID() { return uuid; };
     float getX() { return this->pos.x; };
     float getY() { return this->pos.y; };
     const std::vector<MapTile*> getNeighbors() { return this->neighbors; };
 
-    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, int depth = 0, TTF_Font* font = NULL);
+    /* Rendering functions */
+    void renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& text, SDL_Color color, int x, int y);
+    void render(SDL_Renderer* renderer, SDL_FPoint pos, float scale, TTF_Font* font, int mode);
 
     // Contains all connections
     std::vector<MapTile*> neighbors;
-    // Spanning tree children
-    std::vector<MapTile*> children;
     const Uuid uuid;
 
     SDL_Texture *texture, *text;
@@ -50,8 +48,12 @@ public:
     int size() { return MapTile::getMapTiles().size(); };
     void render(SDL_Renderer* renderer, TTF_Font* font);
 
+    // Contains all MapTiles and their UUID.
+    std::map<int, MapTile*> tilePTR;
+
 private:
     MapTile* spanningTree;
+    bool randomCheck(int chance = 25);
 };
 
 #endif

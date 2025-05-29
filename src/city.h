@@ -5,44 +5,41 @@
 #include <map>
 #include "map.h"
 #include "unit.h"
-//#include "player.h"
 
 class Player;
 
 class City {
 public:
 
+    /* Rendering functions*/
     static void renderAll(SDL_Renderer* renderer);
     void render(SDL_Renderer* renderer);
 
-    // Get the ID of the city
-    int getUUID() const { return uuid; } // Getter for id
+    int getUUID() const { return uuid; } 
     int getTileUUID() const { return tile->uuid; }
+    Player* getOwner() const { return owner; };
+    void setOwner(Player* player) { owner = player; };
 
-    // Check if the city can create a unit this turn
-    bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
-    bool canCreateUnit() const;
-
-    // Create a unit if allowed
+    /* Variables and functions related to unit creation */
     static bool createUnit(int cityUUID, int health, int attack, Player* currentPlayer);
+    bool unitCreatedThisTurn; // Flag to track if a unit was created this turn
+    bool canCreateUnit() const { return !unitCreatedThisTurn; };
+    void resetTurn() { unitCreatedThisTurn = false; }; 
 
-    // Reset the turn status for unit creation
-    void resetTurn();
-
+    /* Static functions that make use of the cities map*/
     static City* makeCity(MapTile* tile, Player* owner);
     static const std::map<int, City*> &getCities() { return cities; };
     static City* uuidToCity(Uuid uuid) { return cities.at(uuid); };
 
-    Player* getOwner() const { return owner; };
-    void setOwner(Player* player) { owner = player; };
 
 private:
-    const Uuid uuid;
+    
     City(MapTile* tile, Player* owner);
-    MapTile* tile;
     static inline std::map<int, City*> cities = std::map<int, City*>();
-    Player* owner;  // add to private section
-
+    const Uuid uuid;
+    Player* owner;  
+    MapTile* tile;
+    
 };
 
 #endif
